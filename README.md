@@ -7,7 +7,7 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 ## 🔗 Repositorios Relacionados
 
 - 🤖 **Bot de Discord:** [Paradox021/Smilbot](https://github.com/Paradox021/Smilbot) *(TypeScript / Discord.js v14)*
-- 🔌 **Backend API:** *Repositorio del Backend API de Smilbot*
+- 🔌 **Backend API:** [Paradox021/backendSmilbot](https://github.com/Paradox021/backendSmilbot)
 
 ---
 
@@ -17,7 +17,7 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 Estructuras de datos, esquemas compartidos y reglas de negocio:
 - 🃏 [Cartas y Rarezas](./Modelos%20y%20Contratos/Cartas%20y%20Rarezas.md): Esquema `Card`, tabla de probabilidades (Common a Mythic) y colores.
 - 💰 [Economía y Rachas](./Modelos%20y%20Contratos/Economia%20y%20Rachas.md): Balance, cooldowns de 23h-48h, rachas diarias y récord.
-- 🍀 [Sistema de Suerte y Tiers](./Modelos%20y%20Contratos/Sistema de%20Suerte%20y%20Tiers.md): Fórmula neutralizada contra mercado, delta de suerte y tiers.
+- 🍀 [Sistema de Suerte y Tiers](./Modelos%20y%20Contratos/Sistema%20de%20Suerte%20y%20Tiers.md): Fórmula neutralizada contra mercado, delta de suerte y tiers.
 - 🏪 [Mercado y Transacciones](./Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md): Ciclo de ofertas (`ACTIVE`, `SOLD`, `CANCELLED`) y libro mayor (*ledger*).
 - 🔮 [Gacha, Pity y Variantes Shiny](./Modelos%20y%20Contratos/Gacha%20y%20Pity.md): Piedad a las 250 tiradas, cartas Shiny ✨ y reciclaje de duplicadas.
 
