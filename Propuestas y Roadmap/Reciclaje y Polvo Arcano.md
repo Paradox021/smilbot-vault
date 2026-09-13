@@ -2,7 +2,10 @@
 
 > [!NOTE]
 > **Estado:** 💡 *En Exploración / Pendiente de Implementación*
-> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción. Representa el diseño técnico acordado para su futura integración.
+> **Alcance (Scope):** 🌐 *Ecosistema Completo (Backend API + Bot Discord)*
+> - 🔌 **Backend:** Campo `dust` en `User`, endpoint `POST /user/:id/recycle` y tienda de consumibles.
+> - 🤖 **Bot Discord:** Comandos `.recycle` / `.scrap`, menú de tienda de consumibles y uso de amuletos/escudos.
+> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción.
 
 ---
 

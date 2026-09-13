@@ -2,7 +2,10 @@
 
 > [!NOTE]
 > **Estado:** 💡 *En Exploración / Pendiente de Implementación*
-> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción. Representa el diseño técnico acordado para su futura integración.
+> **Alcance (Scope):** 🌐 *Ecosistema Completo (Backend API + Bot Discord)*
+> - 🔌 **Backend:** Flag `isShiny: boolean` en cartas/inventario, segundo roll RNG (2%-3%).
+> - 🤖 **Bot Discord:** Borde brillante en Embeds, prefijo `✨` en visor, listados y mercado.
+> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción.
 
 ---
 

@@ -2,7 +2,10 @@
 
 > [!NOTE]
 > **Estado:** 💡 *En Exploración / Pendiente de Implementación*
-> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción. Representa el diseño técnico acordado para su futura integración.
+> **Alcance (Scope):** 🌐 *Ecosistema Completo (Backend API + Bot Discord)*
+> - 🔌 **Backend:** Campo `pityCount` en `User`, lógica forzada a las 250 en `cardController.js`, auditoría en `Transaction`.
+> - 🤖 **Bot Discord:** Barra de progreso en `.stats` y mensaje especial en `.getcard`.
+> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción.
 
 ---
 
