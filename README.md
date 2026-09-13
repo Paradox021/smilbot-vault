@@ -21,6 +21,7 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 - 🔮 [Gacha, Pity y Variantes Shiny](./Modelos%20y%20Contratos/Gacha%20y%20Pity.md): Piedad a las 250 tiradas, cartas Shiny ✨ y reciclaje de duplicadas.
 
 ### 🔌 [Backend API](./Backend%20API)
+- 🛠️ [Scripts y Mantenimiento](./Backend%20API/Scripts%20y%20Mantenimiento.md): Backfill de telemetría y migración de imágenes.
 - 👤 [Endpoints Usuarios y Stats](./Backend%20API/Endpoints%20Usuarios%20y%20Stats.md): `GET /user/:id`, `POST /user`, `POST /dailyBalance`, `GET /transactions`.
 - 🃏 [Endpoints Cartas y Gacha](./Backend%20API/Endpoints%20Cartas.md): `GET /card`, `GET /card/:rarity`, `POST /card` (multipart), `POST /user/:id/card/random`.
 - 🏪 [Endpoints Mercado](./Backend%20API/Endpoints%20Mercado.md): `GET /offers`, `POST /offers` (publicar), `POST /buy`, `POST /cancel`.

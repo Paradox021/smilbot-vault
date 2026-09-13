@@ -20,6 +20,7 @@ Bienvenido a la bóveda de documentación técnica compartida de **Smilbot**. Es
 - [[Modelos y Contratos/Gacha y Pity|Gacha, Pity y Variantes Shiny]]: Sistema de piedad a las 250 tiradas, cartas Shiny ✨ y tienda de consumibles.
 
 ### 🔌 [[Backend API]]
+- [[Backend API/Scripts y Mantenimiento|Scripts y Mantenimiento]]: Backfill de telemetría, migración de imágenes y scripts npm.
 - [[Backend API/Endpoints Usuarios y Stats|Endpoints Usuarios y Stats]]: `GET /user/:id`, `GET /stats`, `GET /transactions`, `POST /dailyBalance`.
 - [[Backend API/Endpoints Cartas|Endpoints Cartas y Gacha]]: `GET /card`, `GET /card/:rarity`, `POST /card` (multipart), `POST /user/:id/card/random`.
 - [[Backend API/Endpoints Mercado|Endpoints Mercado P2P]]: `GET /offers`, `POST /offers` (publicar), `POST /buy`, `POST /cancel`.
