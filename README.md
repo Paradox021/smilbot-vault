@@ -18,7 +18,6 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 - 💰 [Economía y Rachas](./Modelos%20y%20Contratos/Economia%20y%20Rachas.md): Balance, cooldowns de 23h-48h, rachas diarias y récord.
 - 🍀 [Sistema de Suerte y Tiers](./Modelos%20y%20Contratos/Sistema%20de%20Suerte%20y%20Tiers.md): Fórmula neutralizada contra mercado, delta de suerte y tiers.
 - 🏪 [Mercado y Transacciones](./Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md): Ciclo de ofertas (`ACTIVE`, `SOLD`, `CANCELLED`) y libro mayor (*ledger*).
-- 🔮 [Gacha, Pity y Variantes Shiny](./Modelos%20y%20Contratos/Gacha%20y%20Pity.md): Piedad a las 250 tiradas, cartas Shiny ✨ y reciclaje de duplicadas.
 
 ### 🔌 [Backend API](./Backend%20API)
 - 🛠️ [Scripts y Mantenimiento](./Backend%20API/Scripts%20y%20Mantenimiento.md): Backfill de telemetría y migración de imágenes.
@@ -27,6 +26,12 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 - 🏪 [Endpoints Mercado](./Backend%20API/Endpoints%20Mercado.md): `GET /offers`, `POST /offers` (publicar), `POST /buy`, `POST /cancel`.
 - 🏆 [Endpoints Leaderboard](./Backend%20API/Endpoints%20Leaderboard.md): Rankings de suerte, rachas (`streaks`), riqueza (`wealth`) y coleccionistas (`cards`).
 - 🖼️ [Hosting de Imágenes](./Backend%20API/Hosting%20de%20Imagenes.md): Abstracción Local, Cloudinary y Supabase Storage.
+
+### 💡 [Propuestas y Roadmap](./Propuestas%20y%20Roadmap)
+Diseños conceptuales y futuras mecánicas en fase de exploración:
+- 🎯 [Sistema de Piedad (Pity)](./Propuestas%20y%20Roadmap/Sistema%20de%20Piedad%20(Pity).md): Garantía de carta Mítica a las 250 tiradas y control de mala suerte.
+- ✨ [Variantes Shiny](./Propuestas%20y%20Roadmap/Variantes%20Shiny.md): Variante cosmética brillante ultra-rara (2%-3% de aparición).
+- 🧪 [Reciclaje y Polvo Arcano](./Propuestas%20y%20Roadmap/Reciclaje%20y%20Polvo%20Arcano.md): Destrucción de duplicadas por polvo para comprar consumibles y amuletos.
 
 ### 🤖 [Bot Discord](./Bot%20Discord)
 - 🏛️ [Arquitectura y Eventos](./Bot%20Discord/Arquitectura%20y%20Eventos.md): Lifecycle, eventos y middlewares (`checkUser`, `checkAdmin`).
