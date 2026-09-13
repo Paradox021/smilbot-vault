@@ -1,13 +1,15 @@
-# 🏆 Endpoints: Rankings y Clasificación
+# 🏆 Endpoints: Rankings y Clasificaciones (Leaderboards)
+
+El backend provee endpoints agregados de alto rendimiento en `routers/leaderboardRouter.js`:
 
 ---
 
-## 1. Ranking de Suerte Gacha
+## 1. Top Suerte en Gacha
 - **Ruta:** `GET /leaderboard/luck`
 - **Query Params:**
-  - `order`: `'desc'` (los más suertudos) o `'asc'` (los más desafortunados / malditos).
-  - `minPulls`: Mínimo de aperturas de sobre requeridas (default: `20`).
-  - `limit`: Cantidad máxima de registros devueltos (default: `5`).
+  - `order`: `'desc'` (default, más afortunados) o `'asc'` (más desafortunados).
+  - `minPulls`: Mínimo de aperturas requeridas (default: `20`).
+  - `limit`: Límite de resultados (default: `10`).
 - **Respuesta:**
 ```json
 {
@@ -17,20 +19,58 @@
     {
       "rank": 1,
       "discordId": "111222333444555666",
-      "username": "LuckyGamer",
+      "username": "LuckyPlayer",
       "totalCards": 45,
-      "luckPercentage": 145.2,
-      "luckDelta": "+45.2%",
-      "tier": "Godly Luck",
-      "tierCode": "GODLY",
+      "luckPercentage": 138.5,
+      "luckDelta": "+38.5%",
+      "tier": "Lucky",
+      "tierCode": "LUCKY",
       "breakdown": {
-        "common": 20,
-        "rare": 14,
-        "epic": 7,
-        "legendary": 3,
-        "mythic": 1
+        "common": 18,
+        "rare": 11,
+        "epic": 4,
+        "legendary": 2,
+        "mythic": 0
       }
     }
   ]
 }
+```
+
+---
+
+## 2. Top Rachas Diarias
+- **Ruta:** `GET /leaderboard/streaks?type=current&limit=10`
+- **Query Params:** `type` (`'current'` o `'max'`), `limit` (default: `10`).
+- **Respuesta:**
+```json
+[
+  { "discordId": "111...", "username": "Player1", "streak": 45 },
+  { "discordId": "222...", "username": "Player2", "streak": 32 }
+]
+```
+
+---
+
+## 3. Top Fortuna Histórica
+- **Ruta:** `GET /leaderboard/wealth?type=earned&limit=10`
+- **Query Params:** `type` (`'earned'` para histórico ganado o `'current'` para saldo actual).
+- **Respuesta:**
+```json
+[
+  { "discordId": "111...", "username": "Player1", "amount": 25400 },
+  { "discordId": "333...", "username": "Player3", "amount": 18200 }
+]
+```
+
+---
+
+## 4. Top Coleccionistas de Cartas
+- **Ruta:** `GET /leaderboard/cards?limit=10`
+- **Respuesta:**
+```json
+[
+  { "discordId": "111...", "username": "Player1", "cardsCount": 120 },
+  { "discordId": "444...", "username": "Player4", "cardsCount": 98 }
+]
 ```
