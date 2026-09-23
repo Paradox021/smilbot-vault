@@ -51,6 +51,8 @@ interface UserSchema {
   totalCoinsEarned: number;    // Monedas ganadas en toda la historia
   totalCoinsSpent: number;     // Monedas gastadas en toda la historia
   cardsOpenedCount: number;    // Cartas obtenidas por gacha
+  pityCount: number;           // Tiradas consecutivas sin mítica actuales (min: 0)
+  pityMythicsCount: number;    // Total histórico de míticas obtenidas vía pity (min: 0)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -89,19 +91,27 @@ interface UserSchema {
   "cardsCount": 35,
   "cardsOpenedCount": 30,
   "marketSalesCount": 5,
+  "pity": {
+    "pullsSinceLastMythic": 244,
+    "pityThreshold": 250,
+    "pullsUntilGuaranteed": 6,
+    "pityMythicsCount": 0
+  },
   "luck": {
     "totalCards": 35,
     "luckPercentage": 138.5,
     "luckDelta": "+38.5%",
     "tier": "Lucky",
     "tierCode": "LUCKY",
+    "pityMythicsCount": 0,
     "eligibleForLeaderboard": true,
     "breakdown": {
       "common": 18,
       "rare": 11,
       "epic": 4,
       "legendary": 2,
-      "mythic": 0
+      "mythic": 0,
+      "pityMythics": 0
     }
   }
 }

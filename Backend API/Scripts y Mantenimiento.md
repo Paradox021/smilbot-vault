@@ -41,3 +41,16 @@ npm run dev
 # Inicio estándar en producción
 npm run start
 ```
+
+
+## 3. Backfill de Telemetría de Pity (`scripts/backfillPity.js`)
+
+Calcula y sincroniza la racha de tiradas sin mítica de cada usuario combinando el volcado cronológico original (`test.users.json`) con las transacciones posteriores del Ledger (`CARD_BUY`).
+
+```bash
+# Simulación segura sin persistir cambios en MongoDB
+npm run backfill:pity:dry
+
+# Ejecución real aplicando los contadores a la colección users
+npm run backfill:pity
+```

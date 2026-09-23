@@ -10,7 +10,17 @@ $$\text{Cartas Reales de Gacha} = \text{Inventario} - \text{Compras en Mercado} 
 
 ---
 
-## 2. Escala de Tiers de Suerte
+
+## 2. Neutralización Contra el Sistema de Pity
+
+Para que las cartas míticas deterministas obtenidas mediante la red de seguridad de pity (a las 250 tiradas) no distorsionen artificialmente el ranking ni penalicen al usuario:
+
+$\\text{Míticas Evaluadas} = \\max(0, \\text{MíticasGacha} - \\text{pityMythicsCount})$
+$\\text{Tiradas Totales Evaluadas} = \\max(0, \\text{TotalTiradasGacha} - \\text{pityMythicsCount})$
+
+Se descuenta cada mítica de pity tanto del acumulador de míticas como del total de cartas evaluadas, dejando que el ranking refleje exclusivamente el azar puro.
+
+## 3. Escala de Tiers de Suerte
 
 | Tier Code | Nombre | Icono | Rango Delta (%) |
 | :--- | :--- | :--- | :--- |
@@ -22,7 +32,7 @@ $$\text{Cartas Reales de Gacha} = \text{Inventario} - \text{Compras en Mercado} 
 
 ---
 
-## 3. Requisito de Calificación
+## 4. Requisito de Calificación
 - **Mínimo de tiradas:** Se requieren al menos **20 aperturas** (`minPulls = 20`) para que el usuario sea elegible en el Leaderboard (`.top luck`).
 
 Véase también:

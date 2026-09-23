@@ -1,11 +1,11 @@
 # 💡 Propuesta: Sistema de Piedad Mítica (Pity 250)
 
 > [!NOTE]
-> **Estado:** 💡 *En Exploración / Pendiente de Implementación*
+> **Estado:** ✅ *IMPLEMENTADO EN BACKEND API* — Véase especificación activa en [[Modelos y Contratos/Gacha y Pity|Gacha y Pity]]
 > **Alcance (Scope):** 🌐 *Ecosistema Completo (Backend API + Bot Discord)*
 > - 🔌 **Backend:** Campo `pityCount` en `User`, lógica forzada a las 250 en `cardController.js`, auditoría en `Transaction`.
 > - 🤖 **Bot Discord:** Barra de progreso en `.stats` y mensaje especial en `.getcard`.
-> **Aviso para Agentes:** Esta mecánica NO está en el código actual de producción.
+> **Aviso para Agentes:** Esta mecánica YA ESTÁ IMPLEMENTADA en el Backend API (`add-gacha-pity-system`).
 
 ---
 

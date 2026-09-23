@@ -27,15 +27,34 @@ Permite obtener una carta aleatoria de una rareza específica:
 ---
 
 ## 4. Tirada de Gacha del Usuario
-- **Ruta:** `POST /user/:discordId/card/random`
+- **Ruta:** `POST /user/:id/cards/roll` (alias retrocompatible: `POST /user/:discordId/card/random`)
 - **Coste:** 100 monedas.
-- **Acción:**
+- **Acción y Sistema de Pity:**
   1. Valida que `user.balance >= 100`.
-  2. Descuenta 100 monedas (`balance -= 100`).
-  3. Suma estadísticas: `totalCoinsSpent += 100`, `cardsOpenedCount += 1`.
-  4. Realiza el roll ($0-999$) y añade la carta a la colección del usuario.
-  5. Registra la transacción inmutable en el Ledger (`CARD_BUY`) con `metadata: { cardId, cardType, cardName, roll }`.
-- **Respuesta:** Objeto `Card` obtenido.
+  2. Comprueba el estado de pity (`user.pityCount >= 250`):
+     - **Si es Pity (`isPity: true`):** Selecciona directamente una carta Mítica aleatoria (`type: 4`), incrementa `pityMythicsCount += 1` y reinicia `pityCount = 0`.
+     - **Si es Tirada Regular (`isPity: false`):** Genera un roll (0-999). Si sale Mítica natural (`roll < 5`), reinicia `pityCount = 0`. Si sale otra rareza, incrementa `pityCount += 1`.
+  3. Descuenta 100 monedas (`balance -= 100`).
+  4. Suma estadísticas: `totalCoinsSpent += 100`, `cardsOpenedCount += 1`.
+  5. Añade la carta al inventario `user.cards` (incrementando `count` si ya existe).
+  6. Registra la transacción inmutable en el Ledger (`CARD_BUY`) con `metadata: { cardId, cardType, cardName, roll, isPity, pityCountBefore, pityCountAfter }`.
+- **Respuesta:**
+  ```json
+  {
+    "_id": "642dbd17fc0fd3e62bde6659",
+    "name": "SwimmingLarry",
+    "description": "Una carta mítica acuática",
+    "type": 4,
+    "imageUrl": "https://...",
+    "roll": null,
+    "isPity": true,
+    "pity": {
+      "current": 0,
+      "threshold": 250,
+      "remaining": 250
+    }
+  }
+  ```
 
 ---
 
