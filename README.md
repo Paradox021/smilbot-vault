@@ -32,6 +32,7 @@ Diseños conceptuales y futuras mecánicas en fase de exploración:
 - 🎯 [Sistema de Piedad (Pity)](./Propuestas%20y%20Roadmap/Sistema%20de%20Piedad%20(Pity).md): Garantía de carta Mítica a las 250 tiradas y control de mala suerte.
 - ✨ [Variantes Shiny](./Propuestas%20y%20Roadmap/Variantes%20Shiny.md): Variante cosmética brillante ultra-rara (2%-3% de aparición).
 - 🧪 [Reciclaje y Polvo Arcano](./Propuestas%20y%20Roadmap/Reciclaje%20y%20Polvo%20Arcano.md): Destrucción de duplicadas por polvo para comprar consumibles y amuletos.
+- 📚 [Colecciones y Tags](./Propuestas%20y%20Roadmap/Colecciones%20y%20Tags.md): Cartas etiquetadas en varias colecciones temáticas, progreso por colección y recompensas al completarlas.
 
 ### 🤖 [Bot Discord](./Bot%20Discord)
 - 🏛️ [Arquitectura y Eventos](./Bot%20Discord/Arquitectura%20y%20Eventos.md): Lifecycle, eventos y middlewares (`checkUser`, `checkAdmin`).
