@@ -2,6 +2,8 @@
 
 El backend provee endpoints agregados de alto rendimiento en `routers/leaderboardRouter.js`:
 
+> 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
+
 ---
 
 ## 1. Top Suerte en Gacha

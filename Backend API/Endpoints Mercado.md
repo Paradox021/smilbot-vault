@@ -2,6 +2,10 @@
 
 Las ofertas se gestionan como documentos independientes en la colección `market_offers`.
 
+> 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
+
+- Publicar, comprar y cancelar son **Self**: con token de usuario, `body.discordId` debe ser el del propio usuario (si no → `403`). El bot puede actuar en nombre de cualquiera.
+
 ---
 
 ## 1. Listar Ofertas Activas del Servidor
@@ -13,7 +17,7 @@ Las ofertas se gestionan como documentos independientes en la colección `market
 
 ## 2. Publicar Carta en el Mercado
 - **Ruta:** `POST /market/:serverId/offers`
-- **Body:** `{ "sellerDiscordId": string, "cardId": string, "price": number }`
+- **Body:** `{ "discordId": string, "username": string, "cardName": string, "price": number }`
 - **Validaciones y Efecto:**
   1. Verifica que el usuario posea la carta.
   2. Descuenta 1 unidad de la carta del inventario del vendedor (`count -= 1`).
@@ -23,7 +27,7 @@ Las ofertas se gestionan como documentos independientes en la colección `market
 
 ## 3. Comprar Oferta
 - **Ruta:** `POST /market/:serverId/offers/:offerId/buy`
-- **Body:** `{ "buyerId": string }` (o `buyerDiscordId`)
+- **Body:** `{ "discordId": string, "username": string }` (comprador)
 - **Operación Atómica:**
   1. Comprador no puede ser el vendedor.
   2. Comprador debe tener `balance >= price`.
@@ -35,8 +39,8 @@ Las ofertas se gestionan como documentos independientes en la colección `market
 ---
 
 ## 4. Cancelar Oferta
-- **Ruta:** `POST /market/:serverId/offers/:offerId/cancel`
-- **Body:** `{ "sellerDiscordId": string }`
+- **Ruta:** `DELETE /market/:serverId/offers/:offerId`
+- **Body:** `{ "discordId": string, "username": string }` (vendedor)
 - **Efecto:**
   1. Verifica que la oferta esté `ACTIVE` y pertenezca al vendedor.
   2. Devuelve la carta al inventario del vendedor (`count += 1`).

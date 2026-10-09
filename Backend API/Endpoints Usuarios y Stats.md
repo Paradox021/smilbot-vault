@@ -2,6 +2,8 @@
 
 Rutas gestionadas por `routers/userRouter.js` y `controllers/userController.js`.
 
+> 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
+
 ---
 
 ## 1. Directorio Completo de Rutas (`/user`)
@@ -53,6 +55,7 @@ interface UserSchema {
   cardsOpenedCount: number;    // Cartas obtenidas por gacha
   pityCount: number;           // Tiradas consecutivas sin mítica actuales (min: 0)
   pityMythicsCount: number;    // Total histórico de míticas obtenidas vía pity (min: 0)
+  tokenVersion: number;        // Versión de sesión para revocar refresh tokens (select: false, no se devuelve)
   createdAt: Date;
   updatedAt: Date;
 }

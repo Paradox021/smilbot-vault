@@ -20,10 +20,11 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 - 🏪 [Mercado y Transacciones](./Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md): Ciclo de ofertas (`ACTIVE`, `SOLD`, `CANCELLED`) y libro mayor (*ledger*).
 
 ### 🔌 [Backend API](./Backend%20API)
+- 🔐 [Autenticación](./Backend%20API/Autenticacion.md): API key del bot (`Authorization: Bot`), JWT de usuario, login OAuth2 con Discord y matriz de permisos.
 - 🛠️ [Scripts y Mantenimiento](./Backend%20API/Scripts%20y%20Mantenimiento.md): Backfill de telemetría y migración de imágenes.
 - 👤 [Endpoints Usuarios y Stats](./Backend%20API/Endpoints%20Usuarios%20y%20Stats.md): `GET /user/:id`, `POST /user`, `POST /dailyBalance`, `GET /transactions`.
 - 🃏 [Endpoints Cartas y Gacha](./Backend%20API/Endpoints%20Cartas.md): `GET /card`, `GET /card/:rarity`, `POST /card` (multipart), `POST /user/:id/card/random`.
-- 🏪 [Endpoints Mercado](./Backend%20API/Endpoints%20Mercado.md): `GET /offers`, `POST /offers` (publicar), `POST /buy`, `POST /cancel`.
+- 🏪 [Endpoints Mercado](./Backend%20API/Endpoints%20Mercado.md): `GET /offers`, `POST /offers` (publicar), `POST /buy`, `DELETE /offers/:offerId` (cancelar).
 - 🏆 [Endpoints Leaderboard](./Backend%20API/Endpoints%20Leaderboard.md): Rankings de suerte, rachas (`streaks`), riqueza (`wealth`) y coleccionistas (`cards`).
 - 🖼️ [Hosting de Imágenes](./Backend%20API/Hosting%20de%20Imagenes.md): Abstracción Local, Cloudinary y Supabase Storage.
 

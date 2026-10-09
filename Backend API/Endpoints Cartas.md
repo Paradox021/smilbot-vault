@@ -2,6 +2,10 @@
 
 Rutas gestionadas por `routers/cardRouter.js` y `controllers/cardController.js`.
 
+> 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
+
+- `POST /card` y `DELETE /card/:id` requieren **Admin** (bot o `ADMIN_DISCORD_IDS`).
+
 ---
 
 ## 1. Catálogo Completo
