@@ -27,7 +27,7 @@ Código en `src/components/` (embeds, botones, paginación) y `src/handlers/` (r
 ## 3. Mercado (`.market`)
 - Botón para abrir el listado, menú de selección de oferta y botón de compra (`MarketButtons.ts`, `MarketInteractions.ts`).
 - La selección de oferta se guarda en memoria por usuario y mensaje.
-- ⚠️ La compra no funciona actualmente: ver [Comandos de Economía](./Comandos%20de%20Economia.md).
+- Publicar y cancelar se hacen con los comandos `.sell` y `.cancelsale` (ver [Comandos de Economía](./Comandos%20de%20Economia.md)).
 
 ---
 

@@ -10,7 +10,9 @@ Prefijo: `.` · Código en `src/commands/economy/`.
 | `.mycards` | — | `checkUser` | `GET /user/:id/cards` | Abre el navegador de tu inventario. |
 | `.show @usuario` | — | `checkUser` | `GET /user/:id/cards` | Abre el inventario de otro usuario. |
 | `.allcards` | `.cards` | — | `GET /card` | Catálogo de todas las cartas del juego. |
-| `.market` | `.shop` | `checkUser` | `GET /market/:serverId/offers` | Abre el mercado del servidor. |
+| `.market` | `.shop` | `checkUser` | `GET /market/:serverId/offers`, `GET .../:offerId`, `POST .../:offerId/buy` | Abre el mercado del servidor y permite comprar. |
+| `.sell <carta> <precio>` | `.offer` | `checkUser` | `GET /user/:id/cards`, `POST /market/:serverId/offers` | Pone a la venta 1 copia de una carta propia. |
+| `.cancelsale [carta]` | `.unsell`, `.myoffers` | `checkUser` | `GET /market/:serverId/offers`, `DELETE .../:offerId` | Sin argumentos lista tus ofertas; con nombre cancela esa oferta y te devuelve la carta. |
 | `.stats [@usuario]` | `.profile`, `.estadisticas`, `.mystats` | `checkUser` | `GET /user/:id/stats` | Perfil, rachas, pity y suerte (propio o del usuario mencionado). |
 | `.top luck [worst]` | `.topluck`, `.lucktop`, `.leaderboard`, `.ranking` | `checkUser` | `GET /leaderboard/luck` | Top 5 de suerte. `worst`, `bad`, `cursed` o `asc` muestran los menos afortunados. |
 | `.createcard` | `.newcard`, `.addcard` | `checkAdmin` | `POST /card` | Crea una carta con imagen adjunta o URL al final. |
@@ -47,7 +49,15 @@ Cinco bloques en el embed:
 - Top 5 con `minPulls = 20`.
 - Si un jugador tiene míticas por pity, se añade `(+M Pity)` a su conteo de míticas.
 
-### 🏪 `.market`
-- Muestra cuántas ofertas hay y un botón para abrir el listado (menú de selección + botón de compra).
-- **El bot no permite publicar ni cancelar ofertas**: `marketService.addOffer` y `removeOffer` existen pero ningún comando los usa.
-- ⚠️ **La compra no funciona.** Antes de comprar, el bot pide la oferta a `GET /market/:serverId/offers/:offerId`, que no existe en el backend; recibe `404` y responde *"This offer no longer exists."*. Además, `marketService` envía `buyerDiscordId` / `sellerDiscordId` / `cardId`, cuando el backend espera `discordId`, `username` y `cardName`. Ver [Endpoints Mercado](../Backend%20API/Endpoints%20Mercado.md).
+### 🏪 Mercado (`.market`, `.sell`, `.cancelsale`)
+El mercado es **por servidor**: cada comando usa el `guildId` del mensaje y no funciona por mensaje directo. Contrato en [Endpoints Mercado](../Backend%20API/Endpoints%20Mercado.md).
+
+- **`.market`:** muestra cuántas ofertas hay y un botón para abrir el listado (menú de selección + botón de compra, 10 por página).
+  - Al comprar, el bot vuelve a pedir la oferta (`GET .../:offerId`) y avisa si ya no está activa.
+  - Comprar tu propia oferta se rechaza en el bot antes de llamar al backend.
+  - Los errores muestran el mensaje del backend (`You don't have enough money`, etc.).
+- **`.sell <carta> <precio>`:** el último argumento es el precio (entero positivo) y el resto el nombre de la carta, que puede tener espacios y no distingue mayúsculas. El bot busca la carta en tu inventario y la publica por `cardId`. La copia queda retenida hasta que se vende o se cancela.
+  ```text
+  .sell Gato Pan 150
+  ```
+- **`.cancelsale [carta]`:** sin argumentos lista tus ofertas activas en el servidor. Con el nombre de la carta cancela tu oferta más reciente de esa carta y te la devuelve.

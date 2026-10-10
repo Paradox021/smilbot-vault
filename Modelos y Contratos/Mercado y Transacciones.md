@@ -93,4 +93,7 @@ transactionSchema.index({ type: 1 });
 2. **Al cancelar (`DELETE /market/:serverId/offers/:offerId`):** la carta vuelve al inventario del vendedor (`count += 1`).
 3. **Al comprar (`POST .../buy`):** se marca la oferta como vendida, se transfiere la carta, se mueve el dinero y se emiten `MARKET_BUY` y `MARKET_SELL`.
 
-> ⚠️ **Pendiente:** el `AGENTS.md` del backend exige que la compra se ejecute en una **sesión transaccional** de MongoDB, pero hoy los pasos son secuenciales y sin transacción. Un fallo a mitad puede dejar la oferta vendida sin cobrar, o la carta transferida sin registrar en el Ledger. Lo mismo aplica, en menor medida, a publicar y cancelar.
+Las tres operaciones se ejecutan dentro de una **transacción de MongoDB** (`mongoose.connection.transaction` en `services/marketService.js`):
+- Si cualquier paso falla, no se aplica ninguno (oferta, inventarios, saldos y Ledger).
+- Ante un conflicto de escritura (p. ej. dos compras simultáneas de la misma oferta) la transacción se reintenta; el segundo intento ve la oferta ya vendida y responde `400 Offer is not active`.
+- Requiere que MongoDB sea un **replica set** (Atlas lo es). Un MongoDB *standalone* rechaza las transacciones.

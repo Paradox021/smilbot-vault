@@ -96,7 +96,7 @@ Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `
 | `POST/DELETE /user/:id/card/:cardId`, `POST/DELETE /user/:id/balance/:amount` | Admin | — |
 | `GET /user/:id`, `/cards`, `/cards/number`, `/stats` | Autenticado | — |
 | `POST /user/:id/dailyBalance`, `POST /user/:id/card/random`, `GET /user/:id/transactions` | Self | `:id` |
-| `GET /market/:serverId/offers` | Autenticado | — |
+| `GET /market/:serverId/offers`, `GET /market/:serverId/offers/:offerId` | Autenticado | — |
 | `POST /market/:serverId/offers`, `.../buy`, `DELETE .../:offerId` | Self | `body.discordId` |
 | `GET /leaderboard/*` | Autenticado | — |
 
