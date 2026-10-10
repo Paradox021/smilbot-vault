@@ -6,8 +6,8 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 
 ## 🔗 Repositorios Relacionados
 
-- 🤖 **Bot de Discord:** [Paradox021/Smilbot](https://github.com/Paradox021/Smilbot) *(TypeScript / Discord.js v14)*
-- 🔌 **Backend API:** [Paradox021/backendSmilbot](https://github.com/Paradox021/backendSmilbot) *(Node.js / Express / MongoDB)*
+- 🤖 **Bot de Discord:** [Paradox021/smilbot](https://github.com/Paradox021/smilbot) *(TypeScript / Discord.js v14)*
+- 🔌 **Backend API:** [Paradox021/smilbot-backend](https://github.com/Paradox021/smilbot-backend) *(Node.js / Express / MongoDB)*
 - 🌐 **Frontend Web:** `smilbot-project/smilbot-frontend` *(React / TypeScript / Vite)*
 
 ---

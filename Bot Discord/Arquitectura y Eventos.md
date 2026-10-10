@@ -1,6 +1,6 @@
 # 🤖 Bot Discord: Arquitectura y Eventos
 
-- **Repo:** [Paradox021/Smilbot](https://github.com/Paradox021/Smilbot), rama `master`.
+- **Repo:** [Paradox021/smilbot](https://github.com/Paradox021/smilbot), rama `master`.
 
 ---
 
