@@ -146,6 +146,12 @@ La única foto de Smilbot es de baja resolución (unos 490×456 px) y algo bland
 
 **Decisión:** empezar con **B** (foto mejorada) para tener la identidad ya, y dejar **C** como mejora futura.
 
+**Hecho (2026-10-11):** escalado 4× con Real-ESRGAN (modelo `realesrgan-x4plus`), de 493×456 a 1972×1824 px. Es fiel al original (sin rasgos inventados) y aguanta un círculo de 280 px en pantallas retina. Ficheros fuente en la bóveda:
+- `Frontend/assets/smilbot-original.png`: la foto original.
+- `Frontend/assets/smilbot-x4.jpg`: la versión mejorada, de la que salen los WebP de la web.
+
+El encuadre del círculo debe incluir las orejas (en una prueba con un recorte demasiado cerrado se cortaban).
+
 **Cómo usar la foto para que no quede rara:**
 - **Siempre recortada en círculo** y centrada en la cara (como el avatar de Discord). Nunca a sangre ni en rectángulo grande.
 - **Tamaño máximo de 280 px de lado en pantalla** (el doble de píxeles reales con la versión mejorada).
@@ -240,7 +246,6 @@ Mismas reglas: superficies, tarjetas de 16 px y cifras en Nunito. Los estados va
 4. Repaso de cabecera, nav, Inicio, Perfil y Tirada, más 404, errores y estados vacíos.
 5. Reescribir `DESIGN.md` y actualizar `AGENTS.md` y [Arquitectura Frontend](./Arquitectura%20Frontend.md).
 
-**Pendiente de entrada:** la versión mejorada de la foto de Smilbot (opción B), o confirmar que se hace el escalado dentro de la implementación.
 
 Véase también:
 - [[Frontend/Plan Frontend|Plan Frontend]]
