@@ -41,7 +41,7 @@ El `dailyStreak` **guardado** solo se recalcula al reclamar. Los endpoints de le
 | :--- | :--- |
 | `GET /user/:id/stats` | Efectiva, más `lastDaily`, `nextDailyAt` y `streakExpiresAt`. Ver [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md). |
 | `GET /leaderboard/streaks?type=current` | Solo usuarios con `dailyStreak > 0` y `lastDaily` en las últimas 48 h. Ver [Endpoints Leaderboard](../Backend%20API/Endpoints%20Leaderboard.md). |
-| `GET /user/:id`, `GET /auth/me` | El valor **guardado** (documento `User` sin transformar). |
+| `GET /user`, `GET /user/:id`, `GET /user/:id/cards`, `GET /auth/me` | Racha **efectiva** en `dailyStreak` (forma pública del usuario). |
 
 ---
 

@@ -40,7 +40,7 @@ El bot solo usa el leaderboard de suerte; los de rachas, fortuna y coleccionista
 ### 📊 `.stats` (Perfil Económico y Pity)
 Cinco bloques en el embed:
 1. **💰 Economy:** saldo actual, total ganado y total gastado.
-2. **🔥 Daily Streaks:** racha actual, récord y dailies totales.
+2. **🔥 Daily Streaks:** racha actual (efectiva, ya calculada por el backend), récord y dailies totales. Además `Next Daily` (`available now` o tiempo relativo `<t:…:R>` desde `nextDailyAt`) y `Streak Ends` (desde `streakExpiresAt`, solo si hay racha activa).
 3. **🃏 Cards & Market:** cartas en inventario, sobres abiertos y ventas en el mercado.
 4. **✨ Gacha Pity:** `Progress: X/250`, `Guaranteed In: Y pulls` y barra de progreso de 10 segmentos.
 5. **🎲 Gacha Luck:** porcentaje, tier, desviación y desglose por rareza. Si hay míticas por pity se muestra `N🔴 (+M Pity)`.

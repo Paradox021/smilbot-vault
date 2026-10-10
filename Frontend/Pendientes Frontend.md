@@ -12,9 +12,9 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 
 | Necesidad | Endpoint | Impacto | Propuesta |
 | :--- | :--- | :--- | :--- |
-| **`createdAt` en stats** *(opcional)* | `GET /user/:id/stats` | El perfil no puede mostrar "Miembro desde", porque `/auth/me` queda solo para la identidad. | Añadir `createdAt` a la respuesta si se quiere ese dato. |
+| *(ninguna abierta)* | | | |
 
-> ✅ Resueltas el 2026-10-10: racha efectiva en `/stats` (con `lastDaily`, `nextDailyAt` y `streakExpiresAt`) y avatar de Discord (`avatarUrl`). Ver [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md).
+> ✅ Resueltas el 2026-10-10/11: racha efectiva en `/stats` (con `lastDaily`, `nextDailyAt` y `streakExpiresAt`), avatar de Discord (`avatarUrl`) y `createdAt` en `/stats` ("Miembro desde"). Ver [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md).
 
 ---
 

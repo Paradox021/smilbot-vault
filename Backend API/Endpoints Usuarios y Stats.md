@@ -70,7 +70,9 @@ El backend guarda solo el **hash** (`avatar`) y construye la URL con `libs/disco
 - Con hash: `https://cdn.discordapp.com/avatars/{discordId}/{avatar}.{ext}?size=128`, con `ext = gif` si el hash empieza por `a_` (animado) y `png` en otro caso.
 - Sin hash (`null`): avatar por defecto `https://cdn.discordapp.com/embed/avatars/{(BigInt(discordId) >> 22n) % 6n}.png`.
 
-`avatarUrl` se devuelve en `GET /auth/me`, `GET /user/:id/stats`, `PATCH /user/:id/profile` y en cada entrada de los [leaderboards](./Endpoints%20Leaderboard.md). Stats y leaderboards no devuelven el hash; `GET /user/:id` y `GET /auth/me` sí lo incluyen porque devuelven el documento completo.
+`avatarUrl` se devuelve en `GET /user`, `GET /user/:id`, `GET /user/:id/cards`, `GET /auth/me`, `GET /user/:id/stats`, `PATCH /user/:id/profile` y en cada entrada de los [leaderboards](./Endpoints%20Leaderboard.md). Stats y leaderboards no devuelven el hash; las respuestas que devuelven el documento `User` completo sí lo incluyen.
+
+**Forma pública del usuario:** `GET /user`, `GET /user/:id`, `GET /user/:id/cards` y `GET /auth/me` devuelven el documento `User` con dos ajustes (`toUserResponse` en `userService`): `dailyStreak` es la racha **efectiva** (ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva)) y se añade `avatarUrl`.
 
 El hash se actualiza en cada login OAuth (desde `/users/@me` de Discord) y desde el bot con `PATCH /user/:id/profile`.
 
@@ -113,6 +115,7 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
   "discordId": "123456789012345678",
   "username": "Gamer123",
   "avatarUrl": "https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f60718293a4b5c6d7e8f901.gif?size=128",
+  "createdAt": "2026-08-14T11:00:00.000Z",
   "balance": 650,
   "dailyStreak": 11,
   "maxDailyStreak": 11,
@@ -166,7 +169,7 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
 **Casos especiales:**
 - **Sin tiradas válidas (`luck.totalCards = 0`):** `luckPercentage: 100`, `luckDelta: "+0.0%"`, `tier: "Average"`, `tierCode: "AVERAGE"`. No significa suerte media, sino que no hay datos.
 - **No elegible para el leaderboard (menos de 20 cartas válidas):** `eligibleForLeaderboard: false` y se añade `cardsNeeded` con las que faltan.
-- **No incluye** `createdAt`.
+- `createdAt`: fecha de registro del usuario (ISO), o `null` en documentos antiguos sin timestamps.
 - **Usuario inexistente:** `404 { "error": "Usuario no encontrado" }`.
 
 ### D. Historial de Transacciones (`GET /user/:id/transactions`)

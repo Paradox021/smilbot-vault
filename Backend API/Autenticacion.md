@@ -59,7 +59,7 @@ export const api = axios.create({
 - **Error:** siempre `FRONTEND_URL?login=error`, sin `returnTo`.
 
 ### Respuesta de `GET /auth/me`
-Objeto **plano**: el documento `User` completo (el mismo que `GET /user/:id`, sin `tokenVersion`) con `avatarUrl` e `isAdmin` añadidos en la raíz. `404` si el usuario ya no existe. `dailyStreak` es el valor guardado, no la racha efectiva (ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva)).
+Objeto **plano**: la forma pública del usuario (la misma que `GET /user/:id`, sin `tokenVersion`) con `isAdmin` añadido en la raíz. Incluye `avatarUrl` y `dailyStreak` es la racha **efectiva** (ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva)). `404` si el usuario ya no existe.
 ```json
 {
   "_id": "66bc...",
