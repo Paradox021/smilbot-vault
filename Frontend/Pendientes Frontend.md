@@ -12,7 +12,7 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 
 | Necesidad | Endpoint | Impacto | Propuesta |
 | :--- | :--- | :--- | :--- |
-| *(ninguna abierta)* | | | |
+| Servidores del usuario para el mercado | Nuevo (p. ej. `GET /user/:id/guilds`) | Bloquea la fase 6 del [Plan Frontend](./Plan%20Frontend.md): el mercado va por `serverId` y la web no sabe en qué servidores (con el bot) está el usuario. | Opción A: pedir el scope OAuth `guilds` en el login y cruzarlo con los servidores del bot. Opción B: que el bot registre sus servidores y miembros en el backend. Por decidir. |
 
 > ✅ Resueltas el 2026-10-10/11: racha efectiva en `/stats` (con `lastDaily`, `nextDailyAt` y `streakExpiresAt`), avatar de Discord (`avatarUrl`) y `createdAt` en `/stats` ("Miembro desde"). Ver [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md).
 
@@ -32,4 +32,5 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 > ✅ Resueltos el 2026-10-10: volver a la ruta original tras el login (`returnTo`) y CSS de shadcn copiado a mano (ahora se importa del paquete). Ver [Arquitectura Frontend](./Arquitectura%20Frontend.md).
 
 Véase también:
+- [[Frontend/Plan Frontend|Plan Frontend]]
 - [[Frontend/Arquitectura Frontend|Arquitectura Frontend]]
