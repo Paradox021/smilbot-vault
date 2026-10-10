@@ -2,7 +2,7 @@
 
 Hoja de ruta de las pantallas de la web y decisiones de producto y UX tomadas antes de implementarlas. Cuando una fase se termina, su detalle técnico pasa a [Arquitectura Frontend](./Arquitectura%20Frontend.md) y se marca aquí como hecha.
 
-> Decidido el 2026-10-11. La identidad visual se redefine en [Rediseño Visual](./Rediseno%20Visual.md) (oscura y cálida, naranja Smilbot, mascota). Hasta implementarla, el `DESIGN.md` del frontend sigue siendo el de referencia. En ambos, los colores fuertes de las cartas son los de las **rarezas**: así una carta rara destaca sola.
+> La identidad visual es la de [Rediseño Visual](./Rediseno%20Visual.md) (oscura y cálida, naranja Smilbot, mascota), implementada el 2026-10-11 y recogida en el `DESIGN.md` del frontend. Los colores fuertes de las cartas son los de las **rarezas**: así una carta rara destaca sola.
 
 ---
 
@@ -150,7 +150,7 @@ Un **álbum**: el catálogo completo (`GET /card`) cruzado con el inventario (`G
 ## 9. Diseño de la Carta (componente compartido)
 
 Un único componente `CardTile` para tirada, colección, detalle, rankings y mercado:
-- Marco de 1 px con el color de la rareza (de `shared/config/rarities.ts`), radio de 10 px, fondo `surface`.
+- Marco de 1 px con el color de la rareza (de `shared/config/rarities.ts`), radio de 12 px, fondo `card`.
 - **La imagen nunca se recorta:** las ilustraciones tienen proporciones distintas (algunas horizontales), así que la cara de la carta toma la proporción de su imagen, con límites de ancho y alto, y el marco y el nombre la rodean. Solo el dorso es 5:7. En la rejilla de la colección (fase 3) habrá que decidir cómo encajar caras de distinto tamaño sin recortarlas.
 - Variantes: `owned`, `locked` (dorso) y `reveal` (para la tirada).
 - La rareza nunca se comunica **solo** con color: también con el nombre de la rareza (accesibilidad).

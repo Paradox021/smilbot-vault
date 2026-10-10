@@ -2,7 +2,7 @@
 
 Definición de la nueva identidad visual de la web, antes de implementarla. Sustituye a la dirección basada en Raycast del `DESIGN.md` actual del frontend.
 
-> Decidido el 2026-10-11. **Estado: definido, pendiente de implementar** (rama prevista `feature/identidad-visual`). Al implementarlo, `DESIGN.md` se reescribe a partir de esta nota y el detalle técnico pasa a [Arquitectura Frontend](./Arquitectura%20Frontend.md).
+> Decidido el 2026-10-11. **Estado: implementado** (rama `feature/identidad-visual`, 2026-10-11). El `DESIGN.md` del frontend se ha reescrito a partir de esta nota y es la referencia para implementar; el detalle técnico está en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual). Esta nota conserva el porqué de las decisiones.
 
 ---
 
@@ -150,7 +150,7 @@ La única foto de Smilbot es de baja resolución (unos 490×456 px) y algo bland
 - `Frontend/assets/smilbot-original.png`: la foto original.
 - `Frontend/assets/smilbot-x4.jpg`: la versión mejorada, de la que salen los WebP de la web.
 
-El encuadre del círculo debe incluir las orejas (en una prueba con un recorte demasiado cerrado se cortaban).
+El encuadre del círculo incluye las orejas: los WebP salen de un recorte cuadrado de toda la altura de la foto, centrado en la cara (en una prueba con un recorte más cerrado se cortaban).
 
 **Cómo usar la foto para que no quede rara:**
 - **Siempre recortada en círculo** y centrada en la cara (como el avatar de Discord). Nunca a sangre ni en rectángulo grande.
@@ -208,7 +208,7 @@ Solo cuatro elementos, sin nav, saldo ni cartas:
 ### Tirada
 - La secuencia por rareza no cambia ([Plan Frontend](./Plan%20Frontend.md#5-tirada-fase-2)).
 - El botón "Abrir sobre" pasa a ser naranja.
-- El dorso de la carta incorpora la silueta de Smilbot (huella o cara) en lugar del destello genérico.
+- El dorso de la carta lleva una huella en lugar del destello genérico.
 
 ### Perfil, Colección y Rankings
 Mismas reglas: superficies, tarjetas de 16 px y cifras en Nunito. Los estados vacíos llevan a la mascota.

@@ -4,7 +4,7 @@ SPA web de Smilbot para que los usuarios inicien sesión con Discord y consulten
 Las reglas de código y estructura detalladas están en el `AGENTS.md` del repo del frontend; esta nota recoge lo que el **resto del ecosistema** necesita saber.
 
 - **Repo local:** `smilbot-project/smilbot-frontend`
-- **Estado:** sesión, perfil y fase 1 del [Plan Frontend](./Plan%20Frontend.md) (navegación con saldo e Inicio con daily). Sin desplegar.
+- **Estado:** sesión, perfil, fases 1 y 2 del [Plan Frontend](./Plan%20Frontend.md) (Inicio con daily y tirada) e identidad visual de [Rediseño Visual](./Rediseno%20Visual.md). Sin desplegar.
 
 ---
 
@@ -56,6 +56,14 @@ Las rutas privadas sin sesión redirigen a `/` guardando la ruta de retorno.
 - **Daily:** la mutación espera al refetch de las stats antes de terminar, así el saldo, la racha y la cuenta atrás ya están al día cuando se muestra el resultado.
 - **Inventario:** `GET /user/:id/cards` vive en la feature `inventory` (query key `['inventory', 'user', discordId]`).
 - **Rendimiento:** la cabecera está en el bundle principal, así que no usa Motion (el contador del saldo usa `requestAnimationFrame`). Motion solo se carga en las páginas diferidas.
+
+### Identidad Visual
+La decisión está en [Rediseño Visual](./Rediseno%20Visual.md) y la referencia de implementación en el `DESIGN.md` del frontend.
+- **Tokens:** en `src/index.css` (variables de shadcn/ui). `--radius` es 16 px (`rounded-lg`, tarjetas); las cartas y los campos usan `rounded-md` (12 px); botones, insignias y pestañas, `rounded-full`. `--ring` ya incluye la opacidad.
+- **Fuentes:** Nunito (`@fontsource-variable/nunito`) en `font-heading`, aplicada por defecto a `h1`-`h3`; Inter en el resto.
+- **Mascota:** componente `Mascot` (`shared/ui/mascot.tsx`), con `srcset` sobre `src/assets/mascot/smilbot-{128,320,640}.webp`. Favicon en `public/favicon-32.png` y `public/apple-touch-icon.png`. Los ficheros fuente están en la bóveda (`Frontend/assets/`).
+- **Una acción principal por pantalla:** en Inicio, el botón naranja es el del daily si está disponible; si no, el acceso a la tirada (`GuaranteeCard` recibe `primaryAction` según `getDailyStatus`).
+- **Login:** mascota grande con halo y motas fijas, texto de bienvenida y "Continuar con Discord" con el logo de Discord (`DiscordIcon`, de Simple Icons).
 
 ### Tirada
 - **Secuencia** (`features/pull/sequence.ts`, un reducer puro): `idle` → `shuffling` (petición en vuelo) → `anticipation` (brillo del color de la rareza) → `revealing` (giro) → `result`. Los tiempos y efectos por rareza están en `features/pull/reveal.ts`.

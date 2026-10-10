@@ -47,7 +47,7 @@ Diseños conceptuales y futuras mecánicas en fase de exploración:
 ### 🌐 [Frontend](./Frontend)
 - 🏗️ [Arquitectura Frontend](./Frontend/Arquitectura%20Frontend.md): Stack, integración con la API (cookies, refresh, login), configuración que debe coincidir con el backend y alcance de la v1.
 - 🧭 [Plan Frontend](./Frontend/Plan%20Frontend.md): Fases de las pantallas (Inicio, Tirada, Colección, Rankings, Historial, Mercado, Admin) y decisiones de UX: navegación, animación de la tirada por rareza y colección tipo álbum.
-- 🐾 [Rediseño Visual](./Frontend/Rediseno%20Visual.md): Identidad visual de Smilbot (oscura y cálida): paleta, tipografía, formas, mascota, componentes y login. Definida, pendiente de implementar.
+- 🐾 [Rediseño Visual](./Frontend/Rediseno%20Visual.md): Identidad visual de Smilbot (oscura y cálida): paleta, tipografía, formas, mascota, componentes y login. Implementada.
 - 📋 [Pendientes Frontend](./Frontend/Pendientes%20Frontend.md): Necesidades del backend, incoherencias de la bóveda y tareas pendientes detectadas desde el frontend.
 
 ---
