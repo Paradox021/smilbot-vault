@@ -12,6 +12,8 @@ Las reglas de código y estructura detalladas están en el `AGENTS.md` del repo 
 
 Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind CSS + shadcn/ui · Motion · Vitest + MSW.
 
+- **CSS de shadcn:** se importa del paquete (`@import 'shadcn/tailwind.css'` en `src/index.css`), con `shadcn@4.21.4` como `devDependency`. Ya no hay copia manual en `src/shared/ui/`.
+
 ---
 
 ## 2. Integración con el Backend
@@ -21,8 +23,9 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 | Autenticación | Cookies httpOnly del backend (`smilbot_access`, `smilbot_refresh`). El frontend no guarda tokens. Ver [Autenticación](../Backend%20API/Autenticacion.md). |
 | Peticiones | `fetch` con `credentials: 'include'` contra `VITE_API_URL`. |
 | Token expirado | `401 TOKEN_EXPIRED` → un único `POST /auth/refresh` → reintento. |
-| Login | Navegación a `/auth/discord`; vuelve con `?login=success\|error`. |
-| Usuario actual | `GET /auth/me` (incluye `isAdmin`). |
+| Login | Navegación a `/auth/discord?returnTo=<ruta>` (`getDiscordLoginUrl`); vuelve con `?login=success\|error`. Ver "Volver a la ruta original tras el login". |
+| Usuario actual | `GET /auth/me` (incluye `isAdmin` y `avatarUrl`). |
+| Avatar | `avatarUrl` de `/auth/me` y `/user/:id/stats` (tipos `CurrentUser` y `UserStats`). |
 
 ### Configuración que debe coincidir
 
@@ -39,8 +42,19 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 
 | Ruta | Acceso | Descripción |
 | :--- | :--- | :--- |
-| `/` | Pública | Inicio con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a `/perfil`. |
-| `/perfil` | Privada | Identidad de `GET /auth/me` y stats de `GET /user/:id/stats`. Sin sesión redirige a `/`. |
+| `/` | Pública | Inicio con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a la ruta de retorno o a `/perfil`. |
+| `/perfil` | Privada | Identidad de `GET /auth/me` y stats de `GET /user/:id/stats`. Sin sesión redirige a `/` guardando la ruta de retorno. |
+
+### Volver a la ruta original tras el login
+1. `RequireAuth` manda al usuario sin sesión a `/` con `state.returnTo` (ruta + query actuales, sin el parámetro `login`).
+2. `LoginPage` / `LoginButton` construyen `/auth/discord?returnTo=<codificada>` con `getDiscordLoginUrl`.
+3. El backend valida `returnTo` y, tras el login, redirige a `FRONTEND_URL` + esa ruta con `?login=success` ([Autenticación](../Backend%20API/Autenticacion.md#volver-a-la-ruta-original-returnto)).
+4. Si un usuario con sesión llega a `/`, va a `returnTo` o, si no hay, a `/perfil`.
+
+`src/features/auth/returnTo.ts` sanea la ruta en el cliente: solo rutas relativas que empiezan por `/` (no `//` ni `/\`) y nunca la raíz `/`. La validación completa (longitud, caracteres de control, normalización) la hace el backend.
+
+### Avatar
+`UserAvatar` (`src/features/auth/components/`, sobre el `Avatar` de shadcn) muestra `avatarUrl` con las iniciales del usuario como respaldo (sin URL o si la imagen falla). Se usa en el menú de usuario de la cabecera (`UserMenu`) y en `ProfileHeader`. Aún no hay vistas de leaderboard.
 
 ---
 
