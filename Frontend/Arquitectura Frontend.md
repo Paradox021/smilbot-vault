@@ -4,7 +4,7 @@ SPA web de Smilbot para que los usuarios inicien sesión con Discord y consulten
 Las reglas de código y estructura detalladas están en el `AGENTS.md` del repo del frontend; esta nota recoge lo que el **resto del ecosistema** necesita saber.
 
 - **Repo local:** `smilbot-project/smilbot-frontend`
-- **Estado:** base inicializada (stack, cliente HTTP, sesión y perfil mínimo). Sin desplegar.
+- **Estado:** sesión, perfil y fase 1 del [Plan Frontend](./Plan%20Frontend.md) (navegación con saldo e Inicio con daily). Sin desplegar.
 
 ---
 
@@ -42,14 +42,23 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 
 | Ruta | Acceso | Descripción |
 | :--- | :--- | :--- |
-| `/` | Pública | Inicio con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a la ruta de retorno o a `/perfil`. |
-| `/perfil` | Privada | Identidad de `GET /auth/me` y stats de `GET /user/:id/stats`. Sin sesión redirige a `/` guardando la ruta de retorno. |
+| `/` | Pública | Portada con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a la ruta de retorno o a `/inicio`. |
+| `/inicio` | Privada | Tablero: reclamo del daily (`POST /user/:id/dailyBalance`) con cuenta atrás y aviso de racha en peligro, racha y progreso de pity. Ver [Plan Frontend](./Plan%20Frontend.md#4-inicio-fase-1). |
+| `/perfil` | Privada | Identidad de `GET /auth/me` y stats completas de `GET /user/:id/stats`. Se abre desde el menú de usuario. |
+
+Las rutas privadas sin sesión redirigen a `/` guardando la ruta de retorno.
+
+### Cabecera y Datos Compartidos
+- **Cabecera (con sesión):** navegación principal (solo los destinos ya implementados, ver `NAV_ITEMS`), **saldo** siempre visible y menú de usuario desplegable (Perfil, Cerrar sesión).
+- **Stats del usuario:** `GET /user/:id/stats` vive en la feature `stats` (query key `['stats', 'user', discordId]`) y la comparten la cabecera, Inicio y Perfil: una sola petición en caché.
+- **Daily:** la mutación espera al refetch de las stats antes de terminar, así el saldo, la racha y la cuenta atrás ya están al día cuando se muestra el resultado.
+- **Rendimiento:** la cabecera está en el bundle principal, así que no usa Motion (el contador del saldo usa `requestAnimationFrame`). Motion solo se carga en las páginas diferidas.
 
 ### Volver a la ruta original tras el login
 1. `RequireAuth` manda al usuario sin sesión a `/` con `state.returnTo` (ruta + query actuales, sin el parámetro `login`).
 2. `LoginPage` / `LoginButton` construyen `/auth/discord?returnTo=<codificada>` con `getDiscordLoginUrl`.
 3. El backend valida `returnTo` y, tras el login, redirige a `FRONTEND_URL` + esa ruta con `?login=success` ([Autenticación](../Backend%20API/Autenticacion.md#volver-a-la-ruta-original-returnto)).
-4. Si un usuario con sesión llega a `/`, va a `returnTo` o, si no hay, a `/perfil`.
+4. Si un usuario con sesión llega a `/`, va a `returnTo` o, si no hay, a `/inicio`.
 
 `src/features/auth/returnTo.ts` sanea la ruta en el cliente: solo rutas relativas que empiezan por `/` (no `//` ni `/\`) y nunca la raíz `/`. La validación completa (longitud, caracteres de control, normalización) la hace el backend.
 
@@ -58,14 +67,9 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 
 ---
 
-## 3. Alcance Inicial (v1)
+## 3. Alcance
 
-1. Login / logout con Discord.
-2. Mi perfil: balance, racha y stats.
-3. Mi inventario de cartas.
-4. Leaderboards.
-
-Siguientes fases: catálogo, mercado (publicar, comprar, cancelar), saldo diario y tiradas desde la web, y panel de admin.
+El alcance y el orden de las pantallas están en [Plan Frontend](./Plan%20Frontend.md).
 
 ---
 

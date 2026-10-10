@@ -31,6 +31,7 @@ Hoja de ruta de las pantallas de la web y decisiones de producto y UX tomadas an
 - **Móvil:** barra inferior con 4 pestañas (Inicio, Tirar, Colección, Rankings) en la zona del pulgar; la cabecera conserva el saldo y el avatar.
 - Tras el login, el destino por defecto pasa de `/perfil` a `/inicio`.
 - El saldo de la cabecera sale de `GET /user/:id/stats`, nunca de `/auth/me`.
+- La nav solo muestra destinos ya implementados: cada fase añade el suyo. La barra inferior de móvil aparece cuando hay al menos dos (fase 2).
 
 ---
 
@@ -38,7 +39,7 @@ Hoja de ruta de las pantallas de la web y decisiones de producto y UX tomadas an
 
 | Fase | Pantalla | Endpoints | Estado |
 | :--- | :--- | :--- | :--- |
-| 1 | Estructura (nav, saldo) + **Inicio** | `GET /stats`, `POST /dailyBalance` | Pendiente |
+| 1 | Estructura (nav, saldo) + **Inicio** | `GET /stats`, `POST /dailyBalance` | ✅ Hecha (rama `feature/inicio-y-navegacion`) |
 | 2 | **Tirada** | `POST /card/random` | Pendiente |
 | 3 | **Colección** | `GET /card`, `GET /user/:id/cards` | Pendiente |
 | 4 | **Rankings** | `GET /leaderboard/*` | Pendiente |
