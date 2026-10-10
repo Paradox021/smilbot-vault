@@ -38,8 +38,18 @@ messageCreate -> prefijo '.' -> nombre o alias -> middlewares globales -> middle
 
 - **Middleware global:** registra en consola cada comando recibido.
 - Cada comando declara sus propios middlewares (`middlewares: [...]`); no todos los llevan.
-- **`checkUser`:** registra al autor con `POST /user` (`{ discordId, username }`). Un `409` (ya existe) se considera correcto.
+- **`checkUser`:** registra al autor con `POST /user` (`{ discordId, username }`). Un `409` (ya existe) se considera correcto. Después lanza la sincronización de perfil sin esperarla (ver abajo).
 - **`checkAdmin`:** requiere el permiso nativo de Administrador de Discord o un rol llamado `admin` (sin distinguir mayúsculas). Solo lo usa `.createcard`.
+
+### Sincronización de perfil (`src/services/profileSyncService.ts`)
+`syncUserProfile(user)` mantiene al día en el backend el `username` y el hash de `avatar` del autor mediante `userService.updateProfile()` → `PATCH /user/:id/profile` (solo bot, ver [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md)).
+- Se llama *fire-and-forget* desde `checkUser`, después de `POST /user`. **Nunca bloquea ni hace fallar un comando.**
+- Envía `user.username` (el *handle* único, igual que `POST /user`) y `user.avatar` (hash o `null`).
+- Caché en memoria `Map<discordId, { username, avatar }>`: solo envía los campos que cambiaron. Tras cada reinicio del bot la caché está vacía, así que cada usuario se sincroniza una vez (ambos campos) en su siguiente comando.
+- Evita peticiones duplicadas si el usuario lanza varios comandos seguidos (una sola petición en curso por usuario).
+- La caché solo se actualiza si la petición tiene éxito. Un `404` se ignora en silencio (se reintenta en el siguiente comando); otros errores se registran con el prefijo `[ProfileSync]`.
+- **Huecos:** los comandos sin `checkUser` (`allCards`, `createCard`, `ping`, `play`, `stop`, `help`) y las interacciones (botones y menús) no sincronizan.
+- Los tipos `UserStats` y `LuckLeaderboardItem` incluyen `avatarUrl`, pero el embed de `.stats` sigue usando `displayAvatarURL()` de Discord.
 
 ---
 
