@@ -55,9 +55,9 @@ Las cartas míticas obtenidas por pity **no deben inflar la suerte** del jugador
 
 ## 4. Endpoints y Payloads
 
-- **Tirada:** `POST /user/:id/cards/roll`
+- **Tirada:** `POST /user/:id/card/random`
   Retorna la carta junto con `roll`, `isPity` y el objeto de progreso `pity: { current, threshold: 250, remaining }`.
-- **Estadísticas:** `GET /user/:discordId/stats`
+- **Estadísticas:** `GET /user/:id/stats`
   Incluye el bloque `pity: { pullsSinceLastMythic, pityThreshold: 250, pullsUntilGuaranteed, pityMythicsCount }`.
 
 Véase también:

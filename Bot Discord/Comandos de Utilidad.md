@@ -2,5 +2,5 @@
 
 | Comando | Alias | Descripción |
 | :--- | :--- | :--- |
-| `.ping` | `.latency` | Muestra la latencia WebSocket y tiempo de respuesta. |
-| `.help [comando]` | `.h` | Muestra la lista de comandos disponibles o la ayuda detallada de uno. |
+| `.ping` | — | Responde `Pong!`. No mide la latencia. |
+| `.help [categoría \| comando]` | `.h`, `.commands` | Lista los comandos con un menú de categorías y paginación (5 por página), o muestra la ayuda de un comando concreto (descripción, alias, uso y ejemplos). |

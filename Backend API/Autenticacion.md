@@ -49,7 +49,24 @@ export const api = axios.create({
 | `GET` | `/auth/discord/callback` | — | Valida `state`, intercambia el `code`, crea el usuario si no existe, emite cookies y redirige a `FRONTEND_URL?login=success` (o `?login=error`). |
 | `POST` | `/auth/refresh` | Refresh token | Rota el par de tokens. Con cookie → renueva cookies y responde `200 { message }`. Con body `{ refreshToken }` → `200 { accessToken, refreshToken }`. `401` si expirado/revocado. |
 | `POST` | `/auth/logout` | Usuario | Revoca todas las sesiones y borra cookies. `204`. |
-| `GET` | `/auth/me` | Usuario | Perfil del usuario autenticado + `isAdmin`. |
+| `GET` | `/auth/me` | Usuario | Perfil del usuario autenticado + `isAdmin` (ver abajo). |
+
+### Respuesta de `GET /auth/me`
+Objeto **plano**: el documento `User` completo (el mismo que `GET /user/:id`, sin `tokenVersion`) con `isAdmin` añadido en la raíz. `404` si el usuario ya no existe.
+```json
+{
+  "_id": "66bc...",
+  "discordId": "123456789012345678",
+  "username": "Gamer123",
+  "balance": 650,
+  "cards": [{ "cardId": "642d...", "count": 2 }],
+  "lastDaily": "2026-10-09T18:00:00.000Z",
+  "dailyStreak": 11,
+  "...": "resto de campos de User",
+  "isAdmin": false
+}
+```
+Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `isAdmin`); los datos que cambian se leen de sus endpoints (`/user/:id/stats`, `/user/:id/cards`).
 
 ### Errores de autenticación
 ```json

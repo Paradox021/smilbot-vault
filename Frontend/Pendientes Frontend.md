@@ -13,8 +13,6 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 | Necesidad | Endpoint | Impacto | Propuesta |
 | :--- | :--- | :--- | :--- |
 | **Racha efectiva** | `GET /user/:id/stats` | `dailyStreak` solo se recalcula al reclamar el daily ([Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md)). Si han pasado más de 48 h desde `lastDaily`, el perfil muestra una racha que ya está rota, y `/stats` no incluye `lastDaily` para detectarlo. | Devolver la racha efectiva (0 si está rota) o, como mínimo, `lastDaily` + `streakActive: boolean`. Para la futura pantalla de daily, añadir también `nextDailyAt` (fin del cooldown de 23 h). |
-| **Documentar `/auth/me`** | `GET /auth/me` | [Autenticación](../Backend%20API/Autenticacion.md) solo dice "perfil + `isAdmin`". El frontend lo usa solo para la identidad y asume `{ discordId, username, isAdmin }` en la raíz. | Confirmar la forma exacta (¿plano o `{ user, isAdmin }`?) y escribirla en la nota de Autenticación. |
-| **Documentar `luck` sin tiradas** | `GET /user/:id/stats` | No consta qué devuelven `luckPercentage`, `tier` y `tierCode` cuando `totalCards` es `0`. El frontend muestra un estado vacío y no lee esos campos. | Documentar el caso en [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md). |
 | **`createdAt` en stats** *(opcional)* | `GET /user/:id/stats` | El perfil no puede mostrar "Miembro desde", porque `/auth/me` queda solo para la identidad. | Añadir `createdAt` a la respuesta si se quiere ese dato. |
 | **Avatar de Discord** *(opcional)* | `GET /auth/me` | El login usa `scope=identify`, que da acceso al avatar, pero no se guarda ni se devuelve. | Guardar el hash del avatar y devolverlo (o la URL completa del CDN de Discord). |
 
@@ -22,11 +20,7 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 
 ## 2. Incoherencias en la Bóveda
 
-| Tema | Detalle | Acción |
-| :--- | :--- | :--- |
-| Ruta de la tirada | `POST /user/:id/card/random` en [Endpoints Usuarios y Stats](../Backend%20API/Endpoints%20Usuarios%20y%20Stats.md) y [README](../README.md), pero `POST /user/:id/cards/roll` en [Gacha y Pity](../Modelos%20y%20Contratos/Gacha%20y%20Pity.md). | Confirmar cuál es la real en el backend y corregir la otra. |
-| `Card.imageUrl` | El esquema de [Cartas y Rarezas](../Modelos%20y%20Contratos/Cartas%20y%20Rarezas.md) lo marca como `string` obligatorio, pero el `AGENTS.md` del frontend dice que puede faltar. | Aclarar si puede faltar. El frontend usará una imagen de reserva igualmente. |
-| Ejemplo de stats | En el ejemplo de `GET /user/:id/stats`, `luck.totalCards` (35) es mayor que `cardsOpenedCount` (30). Puede ser correcto por las ventas en el mercado, pero confunde. | Revisar el ejemplo o explicar la relación entre ambos campos. |
+*(ninguna abierta)* Las detectadas (ruta de la tirada, `Card.imageUrl` opcional, forma de `/auth/me`, `luck` sin tiradas y el ejemplo de stats) se corrigieron en sus notas el 2026-10-10 tras revisar el código del backend y del bot. Los fallos reales encontrados en esa revisión están en [Problemas Conocidos](../Backend%20API/Problemas%20Conocidos.md).
 
 ---
 

@@ -1,19 +1,21 @@
 # 🪙 Comandos de Economía y Cartas
 
-Prefijo por defecto: `.`
+Prefijo: `.` · Código en `src/commands/economy/`.
 
-| Comando | Alias | Permisos | Descripción |
-| :--- | :--- | :--- | :--- |
-| `.balance` | `.bal`, `.coins` | Todos | Muestra el saldo actual del usuario. |
-| `.dailybalance` | `.db`, `.daily` | Todos | Reclama las 100 monedas diarias y gestiona racha. |
-| `.getcard` | `.gc`, `.buycard` | Todos | Compra 1 sobre gacha aleatorio por 100 monedas (con sistema de pity). |
-| `.mycards` | `.mc`, `.inventory` | Todos | Abre el navegador de cartas del inventario propio. |
-| `.show` | `.card` | Todos | Muestra una carta específica del inventario en detalle. |
-| `.allcards` | `.ac` | Todos | Catálogo de todas las cartas existentes en el juego. |
-| `.market` | `.mkt`, `.shop` | Todos | Abre el mercado libre de ofertas del servidor. |
-| `.stats` | `.profile` | Todos | Muestra perfil, rachas, pity, analíticas de balance y suerte. |
-| `.top` | `.topluck`, `.leaderboard` | Todos | Muestra el ranking de suerte (`.top luck` o `.top luck worst`). |
-| `.createcard` | `.newcard` | **Admin** | Crea una nueva carta con imagen adjunta o URL. |
+| Comando | Alias | Middlewares | Endpoint | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `.balance` | `.bal` | `checkUser` | `GET /user/:id` | Muestra el saldo actual. |
+| `.dailybalance` | `.db` | `checkUser` | `POST /user/:id/dailyBalance` | Reclama las 100 monedas diarias y gestiona la racha. |
+| `.getcard` | `.buycard`, `.gc` | `checkUser` | `POST /user/:id/card/random` | Compra 1 sobre gacha por 100 monedas (con pity). |
+| `.mycards` | — | `checkUser` | `GET /user/:id/cards` | Abre el navegador de tu inventario. |
+| `.show @usuario` | — | `checkUser` | `GET /user/:id/cards` | Abre el inventario de otro usuario. |
+| `.allcards` | `.cards` | — | `GET /card` | Catálogo de todas las cartas del juego. |
+| `.market` | `.shop` | `checkUser` | `GET /market/:serverId/offers` | Abre el mercado del servidor. |
+| `.stats [@usuario]` | `.profile`, `.estadisticas`, `.mystats` | `checkUser` | `GET /user/:id/stats` | Perfil, rachas, pity y suerte (propio o del usuario mencionado). |
+| `.top luck [worst]` | `.topluck`, `.lucktop`, `.leaderboard`, `.ranking` | `checkUser` | `GET /leaderboard/luck` | Top 5 de suerte. `worst`, `bad`, `cursed` o `asc` muestran los menos afortunados. |
+| `.createcard` | `.newcard`, `.addcard` | `checkAdmin` | `POST /card` | Crea una carta con imagen adjunta o URL al final. |
+
+El bot solo usa el leaderboard de suerte; los de rachas, fortuna y coleccionistas no tienen comando.
 
 ---
 
@@ -21,26 +23,31 @@ Prefijo por defecto: `.`
 
 ### 🃏 `.getcard` (Sistema de Pity)
 - **Coste:** 100 monedas.
-- **Tirada Regular:**
-  - El embed muestra la carta obtenida de forma limpia y coleccionable (`Rarity: <Rarity> | Author: <Author>`).
-- **Tirada por Pity (`isPity: true`):**
-  - Se activa al alcanzar 250 tiradas consecutivas sin obtener una carta mítica.
-  - El bot envía como mensaje de texto superior:
-    `🌟 **Smilbot took pity on your bad luck and granted you a guaranteed Mythic card!**`
-  - El embed de la carta permanece 100% limpio y auténtico, preservando el protagonismo del arte de la carta.
+- **Tirada regular:** el embed muestra la carta de forma limpia (`Rarity: <Rarity> | Author: <Author>`).
+- **Tirada por pity (`isPity: true`):** se activa tras 250 tiradas seguidas sin mítica. El bot envía como texto encima del embed:
+  `🌟 **Smilbot took pity on your bad luck and granted you a guaranteed Mythic card!**`
+  El embed de la carta no cambia.
+
+### 🛠️ `.createcard`
+```text
+.createcard <nombre | "nombre con espacios"> <rareza> <descripción> [url_imagen]
+```
+- La imagen puede ir adjunta al mensaje o como URL al final de la descripción.
+- `rareza`: `common`, `rare`, `epic`, `legendary` o `mythic`.
 
 ### 📊 `.stats` (Perfil Económico y Pity)
-Incluye cinco bloques informativos en el embed:
-1. **💰 Economy:** Saldo actual, total ganado y total gastado.
-2. **🔥 Daily Streaks:** Racha actual, récord histórico y dailies totales.
-3. **🃏 Cards & Market:** Cartas en inventario, sobres abiertos y ventas en mercado.
-4. **✨ Gacha Pity:**
-   - `• Progress: X/250`
-   - `• Guaranteed In: Y pulls`
-   - `• ▰▰▱▱▱▱▱▱▱▱ Z%` (Barra de progreso visual animada en 10 segmentos).
-5. **🎲 Gacha Luck:** Rating de suerte, tier (`GODLY`, `LUCKY`, `AVERAGE`, `UNLUCKY`, `CURSED`), desviación de media y desglose por rareza.
-   - Si el usuario obtuvo cartas míticas por pity (`pityMythics > 0`), se refleja en el breakdown al final de las míticas como `... N🔴 (+M Pity)` para cuadrar el inventario total sin inflar la puntuación de suerte.
+Cinco bloques en el embed:
+1. **💰 Economy:** saldo actual, total ganado y total gastado.
+2. **🔥 Daily Streaks:** racha actual, récord y dailies totales.
+3. **🃏 Cards & Market:** cartas en inventario, sobres abiertos y ventas en el mercado.
+4. **✨ Gacha Pity:** `Progress: X/250`, `Guaranteed In: Y pulls` y barra de progreso de 10 segmentos.
+5. **🎲 Gacha Luck:** porcentaje, tier, desviación y desglose por rareza. Si hay míticas por pity se muestra `N🔴 (+M Pity)`.
 
-### 🏆 `.top luck` (Leaderboard de Suerte)
-- Muestra el Top 5 de jugadores más afortunados o desafortunados (`.top luck worst`).
-- En el desglose de rarezas de cada jugador, si posee míticas otorgadas por pity (`pityMythics > 0`), se añade `(+M Pity)` al final del conteo de míticas para máxima transparencia en la competición.
+### 🏆 `.top luck`
+- Top 5 con `minPulls = 20`.
+- Si un jugador tiene míticas por pity, se añade `(+M Pity)` a su conteo de míticas.
+
+### 🏪 `.market`
+- Muestra cuántas ofertas hay y un botón para abrir el listado (menú de selección + botón de compra).
+- **El bot no permite publicar ni cancelar ofertas**: `marketService.addOffer` y `removeOffer` existen pero ningún comando los usa.
+- ⚠️ **La compra no funciona.** Antes de comprar, el bot pide la oferta a `GET /market/:serverId/offers/:offerId`, que no existe en el backend; recibe `404` y responde *"This offer no longer exists."*. Además, `marketService` envía `buyerDiscordId` / `sellerDiscordId` / `cardId`, cuando el backend espera `discordId`, `username` y `cardName`. Ver [Endpoints Mercado](../Backend%20API/Endpoints%20Mercado.md).

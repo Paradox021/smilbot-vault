@@ -9,10 +9,10 @@ Documento de referencia para el modelo de datos de cartas y el sistema de probab
 ```typescript
 interface CardSchema {
   _id: ObjectId | string;
-  name: string;             // Nombre único de la carta
-  description: string;      // Descripción o lore
-  type: number;             // 0: Common, 1: Rare, 2: Epic, 3: Legendary, 4: Mythic
-  imageUrl: string;         // URL pública de la imagen
+  name: string;             // Nombre único de la carta (obligatorio)
+  description: string;      // Descripción o lore (obligatorio)
+  type: number;             // 0: Common, 1: Rare, 2: Epic, 3: Legendary, 4: Mythic (obligatorio)
+  imageUrl?: string;        // URL pública absoluta de la imagen. No es obligatoria en el esquema: los clientes deben tener imagen de reserva
   imagePublicId?: string;   // ID del proveedor de imágenes (para borrado remoto)
   author?: string;          // Creador o artista de la carta
   createdAt: Date;
@@ -36,11 +36,15 @@ El backend utiliza un generador criptográficamente seguro (`crypto.randomInt(0,
 
 *Suma total de probabilidades: $0.5\% + 2.0\% + 10.0\% + 30.0\% + 57.5\% = 100.0\%$.*
 
+Los colores son los que usa el bot (`src/types/CardType.ts`) y el frontend (`src/shared/config/rarities.ts`).
+
 ### Algoritmo de Tirada (`getRandomCard`)
 1. Genera un número entero $roll \in [0, 999]$.
 2. Determina el `type` de rareza según el rango alcanzado.
-3. Selecciona una carta aleatoria entre todas las cartas existentes de esa rareza en la base de datos.
+3. Selecciona una carta aleatoria (`crypto.randomInt`) entre todas las cartas existentes de esa rareza en la base de datos.
 4. Retorna la carta seleccionada junto con el valor exacto del `roll`.
+
+Si el usuario tiene el pity activo, este algoritmo no se ejecuta: ver [[Modelos y Contratos/Gacha y Pity|Gacha y Pity]].
 
 Véase también:
 - [[Modelos y Contratos/Gacha y Pity|Gacha y Pity]]

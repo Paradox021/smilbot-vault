@@ -10,8 +10,9 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 - **Ruta:** `GET /leaderboard/luck`
 - **Query Params:**
   - `order`: `'desc'` (default, más afortunados) o `'asc'` (más desafortunados).
-  - `minPulls`: Mínimo de aperturas requeridas (default: `20`).
-  - `limit`: Límite de resultados (default: `10`).
+  - `minPulls`: Mínimo de cartas válidas para la suerte (`luck.totalCards`, no sobres abiertos). Default `20`, mínimo `1`.
+  - `limit`: Límite de resultados (default: `10`, entre `1` y `100`).
+- El cálculo de cada jugador es el mismo que `luck` en `GET /user/:id/stats` ([Sistema de Suerte y Tiers](../Modelos%20y%20Contratos/Sistema%20de%20Suerte%20y%20Tiers.md)). Empates: por `username`.
 - **Respuesta:**
 ```json
 {
@@ -32,8 +33,10 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
         "rare": 11,
         "epic": 4,
         "legendary": 2,
-        "mythic": 0
-      }
+        "mythic": 0,
+        "pityMythics": 0
+      },
+      "pityMythicsCount": 0
     }
   ]
 }
@@ -43,7 +46,9 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 
 ## 2. Top Rachas Diarias
 - **Ruta:** `GET /leaderboard/streaks?type=current&limit=10`
-- **Query Params:** `type` (`'current'` o `'max'`), `limit` (default: `10`).
+- **Query Params:** `type` (`'current'` o `'max'`, default `'current'`), `limit` (default: `10`, máx. `100`).
+- Solo aparecen usuarios con racha `> 0`.
+- ⚠️ `current` ordena por el `dailyStreak` guardado, que solo se recalcula al reclamar el daily: puede incluir rachas que ya están rotas (más de 48 h sin reclamar). Ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md).
 - **Respuesta:**
 ```json
 [
@@ -56,7 +61,7 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 
 ## 3. Top Fortuna Histórica
 - **Ruta:** `GET /leaderboard/wealth?type=earned&limit=10`
-- **Query Params:** `type` (`'earned'` para histórico ganado o `'current'` para saldo actual).
+- **Query Params:** `type` (`'earned'` para histórico ganado, default, o `'current'` para saldo actual), `limit` (default: `10`, máx. `100`).
 - **Respuesta:**
 ```json
 [
@@ -68,7 +73,8 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 ---
 
 ## 4. Top Coleccionistas de Cartas
-- **Ruta:** `GET /leaderboard/cards?limit=10`
+- **Ruta:** `GET /leaderboard/cards?limit=10` (máx. `100`)
+- Cuenta todas las copias del inventario (`cardsCount`), igual que en `/stats`.
 - **Respuesta:**
 ```json
 [

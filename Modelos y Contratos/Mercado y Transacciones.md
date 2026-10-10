@@ -1,12 +1,12 @@
 # 🏪 Mercado P2P, Transacciones e Índices
 
-Especificación detallada de la arquitectura del mercado libre y el libro mayor inmutable (Ledger).
+Especificación de la arquitectura del mercado libre y el libro mayor inmutable (Ledger). Endpoints en [Endpoints Mercado](../Backend%20API/Endpoints%20Mercado.md).
 
 ---
 
 ## 1. Colección Independiente: `MarketOffer`
 
-Para evitar documentos monolíticos gigantes que sobrepasen el límite de 16 MB en MongoDB, cada oferta vive como un documento independiente en `market_offers`:
+Para evitar documentos monolíticos que sobrepasen el límite de 16 MB en MongoDB, cada oferta vive como un documento independiente en `market_offers` (`models/marketOffer.js`):
 
 ```typescript
 export type MarketOfferStatus = 'ACTIVE' | 'SOLD' | 'CANCELLED';
@@ -14,28 +14,32 @@ export type MarketOfferStatus = 'ACTIVE' | 'SOLD' | 'CANCELLED';
 interface MarketOfferSchema {
   _id: ObjectId | string;
   serverId: string;                // ID del servidor de Discord (Guild ID)
-  seller: ObjectId | string;       // Referencia a 'User'
-  sellerDiscordId: string;         // DiscordId del vendedor
-  cardId: ObjectId | string;       // Referencia a 'Card' en venta
+  seller: ObjectId | string;       // Referencia a 'User' (obligatorio)
+  sellerDiscordId: string | null;  // DiscordId del vendedor
+  cardId: ObjectId | string;       // Referencia a 'Card' en venta (obligatorio)
   price: number;                   // Precio en monedas
-  status: MarketOfferStatus;       // 'ACTIVE' | 'SOLD' | 'CANCELLED' (default: 'ACTIVE')
-  
+  status: MarketOfferStatus;       // default: 'ACTIVE'
+  active: boolean;                 // Campo heredado (default: true). Se mantiene sincronizado con status
+
   // Metadatos de compra/cancelación
-  buyer?: ObjectId | string | null;// Referencia a 'User' (comprador)
-  buyerDiscordId?: string | null;  // DiscordId del comprador
-  soldPrice?: number | null;       // Precio final acordado
-  soldAt?: Date | null;            // Fecha de compra
-  cancelledAt?: Date | null;       // Fecha de cancelación
+  buyer: ObjectId | string | null; // Referencia a 'User' (comprador)
+  buyerDiscordId: string | null;   // DiscordId del comprador
+  soldPrice: number | null;        // Precio final
+  soldAt: Date | null;             // Fecha de compra
+  cancelledAt: Date | null;        // Fecha de cancelación
   createdAt: Date;
   updatedAt: Date;
 }
 ```
 
-### Índices de Alto Rendimiento (MongoDB)
+> `models/market.js` conserva el antiguo modelo `Market` (ofertas embebidas en un documento por servidor). Ya no se usa: el servicio solo trabaja con `MarketOffer`.
+
+### Índices (MongoDB)
 ```javascript
 marketOfferSchema.index({ serverId: 1, status: 1, createdAt: -1 });
 marketOfferSchema.index({ seller: 1, status: 1 });
 marketOfferSchema.index({ buyer: 1, status: 1 });
+// además de índices simples en serverId, seller, status y buyer
 ```
 
 ---
@@ -48,8 +52,8 @@ export type TransactionType =
   | 'CARD_BUY'         // Compra de sobre gacha (-100)
   | 'MARKET_BUY'       // Compra en el mercado (-price)
   | 'MARKET_SELL'      // Ganancia por venta en el mercado (+price)
-  | 'TRADE'            // Intercambio directo
-  | 'ADMIN_ADJUST';    // Ajuste manual por moderador
+  | 'TRADE'            // Reservado: ningún endpoint lo genera todavía
+  | 'ADMIN_ADJUST';    // Ajuste manual (POST/DELETE /user/:id/balance/:amount)
 
 export interface TransactionSchema {
   _id: ObjectId | string;
@@ -58,24 +62,25 @@ export interface TransactionSchema {
   amount: number;              // Variación (+/-)
   balanceBefore: number;       // Saldo previo
   balanceAfter: number;        // Saldo posterior
-  metadata?: {
-    cardId?: string;
-    cardType?: number;         // 0 a 4
-    roll?: number;             // Tirada RNG 0-999
-    sellerDiscordId?: string;
-    buyerDiscordId?: string;
-    offerId?: string;
-    streakAtClaim?: number;
-    previousStreak?: number;
-    previousMaxStreak?: number;
-    isNewRecord?: boolean;
-    streakBroken?: boolean;
-  };
+  metadata: object;            // Depende del tipo (ver tabla). Default: {}
   createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
-### Índices de Alto Rendimiento (MongoDB)
+### `metadata` por tipo (lo que el código escribe realmente)
+
+| Tipo | `metadata` |
+| :--- | :--- |
+| `DAILY_CLAIM` | `{ streakAtClaim, previousStreak, previousMaxStreak, isNewRecord, streakBroken }` |
+| `CARD_BUY` | `{ cardId, cardType, cardName, roll, isPity, pityCountBefore, pityCountAfter }` (`roll: null` si fue por pity) |
+| `MARKET_BUY` | `{ cardId, sellerDiscordId, offerId }` |
+| `MARKET_SELL` | `{ cardId, buyerDiscordId, offerId }` |
+| `ADMIN_ADJUST` | `{}` |
+
+> El comentario de `models/transaction.js` describe para el mercado `{ offerId, cardId, cardName, cardType, serverId, counterpartyDiscordId }`, pero el controlador no lo escribe así. La tabla de arriba es la fuente correcta.
+
+### Índices (MongoDB)
 ```javascript
 transactionSchema.index({ discordId: 1, createdAt: -1 });
 transactionSchema.index({ type: 1 });
@@ -84,6 +89,8 @@ transactionSchema.index({ type: 1 });
 ---
 
 ## 3. Escrow y Atomicidad en el Mercado
-1. **Al publicar (`POST /market/:id/offers`):** La carta se descuenta inmediatamente del inventario del vendedor (`count -= 1`) para actuar como depósito en garantía (*escrow*), evitando que la venda dos veces o la intercambie mientras está en el mercado.
-2. **Al cancelar (`POST .../cancel`):** La carta se devuelve automáticamente al inventario del vendedor (`count += 1`).
-3. **Al comprar (`POST .../buy`):** En una sesión transaccional de base de datos se transfiere el dinero, se transfiere la carta al comprador, y se emiten los dos registros contables (`MARKET_BUY` y `MARKET_SELL`).
+1. **Al publicar (`POST /market/:serverId/offers`):** la carta se descuenta del inventario del vendedor (`count -= 1`) como depósito en garantía (*escrow*), para que no pueda venderla dos veces.
+2. **Al cancelar (`DELETE /market/:serverId/offers/:offerId`):** la carta vuelve al inventario del vendedor (`count += 1`).
+3. **Al comprar (`POST .../buy`):** se marca la oferta como vendida, se transfiere la carta, se mueve el dinero y se emiten `MARKET_BUY` y `MARKET_SELL`.
+
+> ⚠️ **Pendiente:** el `AGENTS.md` del backend exige que la compra se ejecute en una **sesión transaccional** de MongoDB, pero hoy los pasos son secuenciales y sin transacción. Un fallo a mitad puede dejar la oferta vendida sin cobrar, o la carta transferida sin registrar en el Ledger. Lo mismo aplica, en menor medida, a publicar y cancelar.

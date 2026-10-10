@@ -4,6 +4,8 @@ Rutas gestionadas por `routers/userRouter.js` y `controllers/userController.js`.
 
 > 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
 
+En todas las rutas `:id` es el **`discordId`**, salvo en `DELETE /user/:id` (ver la tabla).
+
 ---
 
 ## 1. Directorio Completo de Rutas (`/user`)
@@ -11,20 +13,20 @@ Rutas gestionadas por `routers/userRouter.js` y `controllers/userController.js`.
 | Método | Ruta | Descripción |
 | :--- | :--- | :--- |
 | `GET` | `/user` | Lista todos los usuarios registrados en el sistema. |
-| `GET` | `/user/:id` | Obtiene los datos de un usuario por su `discordId`. |
-| `POST` | `/user` | Registra un nuevo usuario (`{ discordId, username }`). 409 si ya existe. |
-| `POST` | `/user/id` | Obtiene o crea un usuario automáticamente a partir del body. |
-| `DELETE` | `/user/:id` | Elimina un usuario del sistema. |
+| `GET` | `/user/:id` | Documento `User` completo. `404` si no existe. |
+| `POST` | `/user` | Registra un nuevo usuario (`{ discordId, username }`). `201`; `409` si ya existe. |
+| `POST` | `/user/id` | Obtiene o crea un usuario a partir del body (`{ discordId, username }`). Siempre `200`. |
+| `DELETE` | `/user/:id` | Elimina un usuario. ⚠️ Aquí `:id` es el **`_id` de MongoDB**, no el `discordId`. |
 | `POST` | `/user/:id/dailyBalance` | Reclamo diario de 100 monedas y cálculo de racha. |
-| `POST` | `/user/:id/card/random` | Tirada de sobre gacha (100 monedas, RNG 0-999). |
-| `GET` | `/user/:id/cards` | Inventario completo agrupado por carta con contador (`count: N`). |
-| `GET` | `/user/:id/cards/number` | Conteo de cartas del usuario agrupado por rareza (`type`). |
-| `POST` | `/user/:id/card/:cardId` | Añade una carta manualmente al inventario del usuario. |
-| `DELETE` | `/user/:id/card/:cardId` | Remueve una carta del inventario del usuario. |
-| `POST` | `/user/:id/balance/:amount` | Ajuste administrativo: añade saldo (`ADMIN_ADJUST`). |
-| `DELETE` | `/user/:id/balance/:amount` | Ajuste administrativo: descuenta saldo (`ADMIN_ADJUST`). |
-| `GET` | `/user/:id/stats` | Perfil económico, métricas agregadas y suerte en gacha. |
-| `GET` | `/user/:id/transactions` | Historial paginado de movimientos del Ledger (`?page=1&limit=10`). |
+| `POST` | `/user/:id/card/random` | Tirada de sobre gacha (100 monedas, RNG 0-999, pity). Ver [Endpoints Cartas](./Endpoints%20Cartas.md#4-tirada-de-gacha-del-usuario). |
+| `GET` | `/user/:id/cards` | El `User` con `cards` sustituido por las cartas completas + `count`. |
+| `GET` | `/user/:id/cards/number` | Conteo de cartas agrupado por rareza: `[{ "_id": <type>, "count": N }]`. |
+| `POST` | `/user/:id/card/:cardId` | Añade una copia de una carta al inventario. Devuelve el `User`. |
+| `DELETE` | `/user/:id/card/:cardId` | Quita una copia de una carta del inventario. Devuelve el `cardId`. |
+| `POST` | `/user/:id/balance/:amount` | Ajuste administrativo: añade saldo (`ADMIN_ADJUST`). Devuelve el `User`. |
+| `DELETE` | `/user/:id/balance/:amount` | Ajuste administrativo: descuenta saldo (`ADMIN_ADJUST`). Devuelve el `User`. |
+| `GET` | `/user/:id/stats` | Perfil económico, métricas agregadas, pity y suerte en gacha. |
+| `GET` | `/user/:id/transactions` | Historial paginado del Ledger (`?page=1&limit=10`, `limit` máx. 100). |
 
 ---
 
@@ -38,21 +40,21 @@ interface UserCard {
 
 interface UserSchema {
   _id: ObjectId | string;
-  discordId: string;           // ID único en Discord (index: 1, unique: true)
+  discordId: string;           // ID único en Discord (unique). Siempre string: es un snowflake de 64 bits
   username: string;            // Nombre de usuario en Discord
   balance: number;             // Saldo de monedas virtuales (default: 0)
   cards: UserCard[];           // Array de cartas agrupadas
-  lastDaily: Date;             // Última fecha de reclamo del daily
+  lastDaily: Date;             // Último reclamo del daily (default: hace 24 h)
   lastTimeCommand: Date;       // Alias retrocompatible de lastDaily
 
   // --- Métricas y Telemetría ---
-  dailyStreak: number;         // Racha consecutiva actual
+  dailyStreak: number;         // Racha guardada en el último reclamo (ver "Racha mostrada" en Economía y Rachas)
   maxDailyStreak: number;      // Récord histórico alcanzado
-  previousMaxStreak: number;   // Marca de récord consolidada previa
+  previousMaxStreak: number;   // Récord consolidado cuando se rompió la última racha
   totalDailiesClaimed: number; // Total de dailies reclamados de por vida
   totalCoinsEarned: number;    // Monedas ganadas en toda la historia
   totalCoinsSpent: number;     // Monedas gastadas en toda la historia
-  cardsOpenedCount: number;    // Cartas obtenidas por gacha
+  cardsOpenedCount: number;    // Sobres gacha abiertos
   pityCount: number;           // Tiradas consecutivas sin mítica actuales (min: 0)
   pityMythicsCount: number;    // Total histórico de míticas obtenidas vía pity (min: 0)
   tokenVersion: number;        // Versión de sesión para revocar refresh tokens (select: false, no se devuelve)
@@ -78,8 +80,23 @@ interface UserSchema {
   "totalDailiesClaimed": 42
 }
 ```
+- **Cooldown activo (< 23 h):** `400 { "error": "You can't use this command yet...", "diffHours": 5, "diffMinutes": 12 }`, con el tiempo que falta.
+- Reglas de racha y récord en [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md).
 
-### B. Estadísticas y Suerte (`GET /user/:id/stats`)
+### B. Inventario (`GET /user/:id/cards`)
+Devuelve el documento `User` completo, pero con `cards` reemplazado por las cartas pobladas (solo las que tienen `count > 0`), ordenadas por `type` ascendente. No está paginado.
+```json
+{
+  "discordId": "123456789012345678",
+  "username": "Gamer123",
+  "balance": 650,
+  "cards": [
+    { "_id": "642d...", "name": "SwimmingLarry", "description": "...", "type": 4, "imageUrl": "https://...", "author": "...", "count": 2 }
+  ]
+}
+```
+
+### C. Estadísticas y Suerte (`GET /user/:id/stats`)
 ```json
 {
   "discordId": "123456789012345678",
@@ -101,18 +118,18 @@ interface UserSchema {
     "pityMythicsCount": 0
   },
   "luck": {
-    "totalCards": 35,
-    "luckPercentage": 138.5,
-    "luckDelta": "+38.5%",
-    "tier": "Lucky",
-    "tierCode": "LUCKY",
+    "totalCards": 28,
+    "luckPercentage": 97.4,
+    "luckDelta": "-2.6%",
+    "tier": "Average",
+    "tierCode": "AVERAGE",
     "pityMythicsCount": 0,
     "eligibleForLeaderboard": true,
     "breakdown": {
-      "common": 18,
-      "rare": 11,
-      "epic": 4,
-      "legendary": 2,
+      "common": 15,
+      "rare": 9,
+      "epic": 3,
+      "legendary": 1,
       "mythic": 0,
       "pityMythics": 0
     }
@@ -120,7 +137,18 @@ interface UserSchema {
 }
 ```
 
-### C. Historial de Transacciones (`GET /user/:id/transactions`)
+**Qué cuenta cada campo de cartas:**
+- `cardsCount`: copias en el inventario ahora mismo (incluye las compradas en el mercado y las añadidas por un admin).
+- `cardsOpenedCount`: sobres gacha abiertos en toda la historia.
+- `luck.totalCards`: cartas que **cuentan para la suerte**. Por cada carta: `max(0, inventario − compradas en mercado) + vendidas en mercado`; después se restan las míticas de pity. Normalmente es ≤ `cardsOpenedCount`, pero puede superarlo si hay cartas añadidas por un admin o anteriores a la telemetría. Ver [Sistema de Suerte y Tiers](../Modelos%20y%20Contratos/Sistema%20de%20Suerte%20y%20Tiers.md).
+
+**Casos especiales:**
+- **Sin tiradas válidas (`luck.totalCards = 0`):** `luckPercentage: 100`, `luckDelta: "+0.0%"`, `tier: "Average"`, `tierCode: "AVERAGE"`. No significa suerte media, sino que no hay datos.
+- **No elegible para el leaderboard (menos de 20 cartas válidas):** `eligibleForLeaderboard: false` y se añade `cardsNeeded` con las que faltan.
+- **No incluye** `lastDaily` ni `createdAt`.
+- ⚠️ **Usuario inexistente:** responde `500 { "error": "Usuario no encontrado" }` en lugar de `404`, porque el servicio lanza el error antes de que el controlador lo compruebe.
+
+### D. Historial de Transacciones (`GET /user/:id/transactions`)
 ```json
 {
   "transactions": [
@@ -133,9 +161,13 @@ interface UserSchema {
       "balanceAfter": 650,
       "metadata": {
         "streakAtClaim": 11,
-        "isNewRecord": true
+        "previousStreak": 10,
+        "previousMaxStreak": 10,
+        "isNewRecord": true,
+        "streakBroken": false
       },
-      "createdAt": "2026-08-14T11:00:00.000Z"
+      "createdAt": "2026-08-14T11:00:00.000Z",
+      "updatedAt": "2026-08-14T11:00:00.000Z"
     }
   ],
   "total": 52,
@@ -143,3 +175,9 @@ interface UserSchema {
   "totalPages": 6
 }
 ```
+Orden: más reciente primero. El contenido de `metadata` por tipo está en [Mercado y Transacciones](../Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md).
+
+---
+
+## 4. Errores
+Salvo los casos indicados (`404` en `GET /user/:id`, `/cards`, `/cards/number` y `/transactions`; `409` al crear; `400` en el daily y en la tirada), los errores devuelven `500 { "error": "<mensaje>" }`.
