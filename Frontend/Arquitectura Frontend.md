@@ -4,7 +4,7 @@ SPA web de Smilbot para que los usuarios inicien sesión con Discord y consulten
 Las reglas de código y estructura detalladas están en el `AGENTS.md` del repo del frontend; esta nota recoge lo que el **resto del ecosistema** necesita saber.
 
 - **Repo local:** `smilbot-project/smilbot-frontend`
-- **Estado:** en inicio (sin desplegar).
+- **Estado:** base inicializada (stack, cliente HTTP, sesión y perfil mínimo). Sin desplegar.
 
 ---
 
@@ -35,6 +35,13 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 - En desarrollo, frontend y API están ambos en `localhost` (mismo *site*): las cookies funcionan con `SameSite=lax` sin HTTPS.
 - En producción conviene servir frontend y API bajo el mismo dominio (p. ej. `app.dominio` y `api.dominio`). Con dominios distintos hacen falta `COOKIE_SAMESITE=none` y `COOKIE_SECURE=true`.
 
+### Rutas de la SPA
+
+| Ruta | Acceso | Descripción |
+| :--- | :--- | :--- |
+| `/` | Pública | Inicio con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a `/perfil`. |
+| `/perfil` | Privada | Identidad de `GET /auth/me` y stats de `GET /user/:id/stats`. Sin sesión redirige a `/`. |
+
 ---
 
 ## 3. Alcance Inicial (v1)
@@ -48,8 +55,6 @@ Siguientes fases: catálogo, mercado (publicar, comprar, cancelar), saldo diario
 
 ---
 
-## 4. Necesidades Pendientes del Backend
+## 4. Pendientes
 
-Endpoints o cambios que el frontend necesita y aún no existen. Añádelos aquí antes de implementarlos en el backend.
-
-- *(ninguna por ahora)*
+Las necesidades del backend, las incoherencias de la bóveda y los pendientes propios del frontend se recogen en [Pendientes Frontend](./Pendientes%20Frontend.md). Añade ahí cualquier endpoint o cambio que el frontend necesite antes de implementarlo en el backend.
