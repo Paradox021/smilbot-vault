@@ -4,7 +4,7 @@ Rutas gestionadas por `routers/userRouter.js` y `controllers/userController.js`.
 
 > 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
 
-En todas las rutas `:id` es el **`discordId`**, salvo en `DELETE /user/:id` (ver la tabla).
+En todas las rutas `:id` es el **`discordId`**.
 
 ---
 
@@ -16,7 +16,8 @@ En todas las rutas `:id` es el **`discordId`**, salvo en `DELETE /user/:id` (ver
 | `GET` | `/user/:id` | Documento `User` completo. `404` si no existe. |
 | `POST` | `/user` | Registra un nuevo usuario (`{ discordId, username }`). `201`; `409` si ya existe. |
 | `POST` | `/user/id` | Obtiene o crea un usuario a partir del body (`{ discordId, username }`). Siempre `200`. |
-| `DELETE` | `/user/:id` | Elimina un usuario. ⚠️ Aquí `:id` es el **`_id` de MongoDB**, no el `discordId`. |
+| `DELETE` | `/user/:id` | Elimina un usuario. Devuelve el `User` borrado; `404 { "error": "Usuario no encontrado" }` si no existe. |
+| `PATCH` | `/user/:id/profile` | **Solo bot.** Sincroniza `username` y/o `avatar` de Discord. Ver la sección 3.E. |
 | `POST` | `/user/:id/dailyBalance` | Reclamo diario de 100 monedas y cálculo de racha. |
 | `POST` | `/user/:id/card/random` | Tirada de sobre gacha (100 monedas, RNG 0-999, pity). Ver [Endpoints Cartas](./Endpoints%20Cartas.md#4-tirada-de-gacha-del-usuario). |
 | `GET` | `/user/:id/cards` | El `User` con `cards` sustituido por las cartas completas + `count`. |
@@ -41,14 +42,15 @@ interface UserCard {
 interface UserSchema {
   _id: ObjectId | string;
   discordId: string;           // ID único en Discord (unique). Siempre string: es un snowflake de 64 bits
-  username: string;            // Nombre de usuario en Discord
+  username: string;            // Nombre de usuario en Discord (handle). Se actualiza en cada login OAuth y desde el bot
+  avatar: string | null;       // Hash del avatar de Discord (default: null = avatar por defecto). Ver "Avatar de Discord"
   balance: number;             // Saldo de monedas virtuales (default: 0)
   cards: UserCard[];           // Array de cartas agrupadas
   lastDaily: Date;             // Último reclamo del daily (default: hace 24 h)
   lastTimeCommand: Date;       // Alias retrocompatible de lastDaily
 
   // --- Métricas y Telemetría ---
-  dailyStreak: number;         // Racha guardada en el último reclamo (ver "Racha mostrada" en Economía y Rachas)
+  dailyStreak: number;         // Racha guardada en el último reclamo (ver "Racha efectiva" en Economía y Rachas)
   maxDailyStreak: number;      // Récord histórico alcanzado
   previousMaxStreak: number;   // Récord consolidado cuando se rompió la última racha
   totalDailiesClaimed: number; // Total de dailies reclamados de por vida
@@ -62,6 +64,15 @@ interface UserSchema {
   updatedAt: Date;
 }
 ```
+
+### Avatar de Discord (`avatarUrl`)
+El backend guarda solo el **hash** (`avatar`) y construye la URL con `libs/discordAvatar.js`:
+- Con hash: `https://cdn.discordapp.com/avatars/{discordId}/{avatar}.{ext}?size=128`, con `ext = gif` si el hash empieza por `a_` (animado) y `png` en otro caso.
+- Sin hash (`null`): avatar por defecto `https://cdn.discordapp.com/embed/avatars/{(BigInt(discordId) >> 22n) % 6n}.png`.
+
+`avatarUrl` se devuelve en `GET /auth/me`, `GET /user/:id/stats`, `PATCH /user/:id/profile` y en cada entrada de los [leaderboards](./Endpoints%20Leaderboard.md). Stats y leaderboards no devuelven el hash; `GET /user/:id` y `GET /auth/me` sí lo incluyen porque devuelven el documento completo.
+
+El hash se actualiza en cada login OAuth (desde `/users/@me` de Discord) y desde el bot con `PATCH /user/:id/profile`.
 
 ---
 
@@ -101,10 +112,14 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
 {
   "discordId": "123456789012345678",
   "username": "Gamer123",
+  "avatarUrl": "https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f60718293a4b5c6d7e8f901.gif?size=128",
   "balance": 650,
   "dailyStreak": 11,
   "maxDailyStreak": 11,
   "previousMaxStreak": 10,
+  "lastDaily": "2026-10-09T18:00:00.000Z",
+  "nextDailyAt": "2026-10-10T17:00:00.000Z",
+  "streakExpiresAt": "2026-10-11T18:00:00.000Z",
   "totalDailiesClaimed": 42,
   "totalCoinsEarned": 5400,
   "totalCoinsSpent": 4750,
@@ -137,6 +152,12 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
 }
 ```
 
+**Campos de racha** (ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva)):
+- `dailyStreak`: racha **efectiva**. `0` si han pasado más de 48 h desde `lastDaily`, aunque el valor guardado sea mayor.
+- `lastDaily`: último reclamo (ISO).
+- `nextDailyAt`: `lastDaily + 23 h`. Si ya pasó, se puede reclamar.
+- `streakExpiresAt`: `lastDaily + 48 h`, o `null` si no hay racha activa.
+
 **Qué cuenta cada campo de cartas:**
 - `cardsCount`: copias en el inventario ahora mismo (incluye las compradas en el mercado y las añadidas por un admin).
 - `cardsOpenedCount`: sobres gacha abiertos en toda la historia.
@@ -145,8 +166,8 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
 **Casos especiales:**
 - **Sin tiradas válidas (`luck.totalCards = 0`):** `luckPercentage: 100`, `luckDelta: "+0.0%"`, `tier: "Average"`, `tierCode: "AVERAGE"`. No significa suerte media, sino que no hay datos.
 - **No elegible para el leaderboard (menos de 20 cartas válidas):** `eligibleForLeaderboard: false` y se añade `cardsNeeded` con las que faltan.
-- **No incluye** `lastDaily` ni `createdAt`.
-- ⚠️ **Usuario inexistente:** responde `500 { "error": "Usuario no encontrado" }` en lugar de `404`, porque el servicio lanza el error antes de que el controlador lo compruebe.
+- **No incluye** `createdAt`.
+- **Usuario inexistente:** `404 { "error": "Usuario no encontrado" }`.
 
 ### D. Historial de Transacciones (`GET /user/:id/transactions`)
 ```json
@@ -177,7 +198,31 @@ Devuelve el documento `User` completo, pero con `cards` reemplazado por las cart
 ```
 Orden: más reciente primero. El contenido de `metadata` por tipo está en [Mercado y Transacciones](../Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md).
 
+### E. Perfil de Discord (`PATCH /user/:id/profile`)
+Lo usa el bot para mantener al día el nombre y el avatar ([Arquitectura y Eventos](../Bot%20Discord/Arquitectura%20y%20Eventos.md)). Solo acepta la API key del bot (`requireBot`): cualquier JWT de usuario, aunque sea admin o actúe sobre sí mismo, recibe `403`.
+
+**Body** (al menos un campo):
+
+| Campo | Tipo | Regla |
+| :--- | :--- | :--- |
+| `username` | `string` | Se recorta (`trim`); entre 1 y 32 caracteres. |
+| `avatar` | `string \| null` | Hash de Discord `/^(a_)?[0-9a-f]{32}$/`, o `null` para el avatar por defecto. |
+
+**Respuesta (200):**
+```json
+{
+  "discordId": "123456789012345678",
+  "username": "gamer123",
+  "avatar": "a_1b2c3d4e5f60718293a4b5c6d7e8f901",
+  "avatarUrl": "https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f60718293a4b5c6d7e8f901.gif?size=128"
+}
+```
+- `400 { "error": "<motivo>" }`: body inválido, campo con formato incorrecto o sin ningún campo.
+- `401`: sin credenciales o API key inválida. `403 { "error": "Requiere la API key del bot" }`: token de usuario.
+- `404 { "error": "Usuario no encontrado" }`.
+- No es un cambio de saldo: **no** registra `Transaction`.
+
 ---
 
 ## 4. Errores
-Salvo los casos indicados (`404` en `GET /user/:id`, `/cards`, `/cards/number` y `/transactions`; `409` al crear; `400` en el daily y en la tirada), los errores devuelven `500 { "error": "<mensaje>" }`.
+Salvo los casos indicados (`404` en `GET /user/:id`, `DELETE /user/:id`, `/cards`, `/cards/number`, `/stats`, `/transactions` y `/profile`; `404 { "error": "No cards found for this type" }` en la tirada si la rareza obtenida no tiene cartas, sin cobrar; `409` al crear; `400` en el daily, en la tirada y en `/profile`; `403` en `/profile` con token de usuario), los errores devuelven `500 { "error": "<mensaje>" }`.

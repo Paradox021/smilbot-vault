@@ -16,15 +16,15 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 
 ### 📐 [Modelos y Contratos](./Modelos%20y%20Contratos)
 - 🃏 [Cartas y Rarezas](./Modelos%20y%20Contratos/Cartas%20y%20Rarezas.md): Esquema `Card`, tabla de probabilidades reales (Mythic 0.5%, Legendary 2%, Epic 10%, Rare 30%, Common 57.5%).
-- 💰 [Economía y Rachas](./Modelos%20y%20Contratos/Economia%20y%20Rachas.md): Balance, cooldowns de 23h-48h, rachas diarias y récord.
+- 💰 [Economía y Rachas](./Modelos%20y%20Contratos/Economia%20y%20Rachas.md): Balance, cooldowns de 23h-48h, rachas diarias, racha efectiva y récord.
 - 🍀 [Sistema de Suerte y Tiers](./Modelos%20y%20Contratos/Sistema%20de%20Suerte%20y%20Tiers.md): Fórmula neutralizada contra mercado, delta de suerte y tiers.
-- 🏪 [Mercado y Transacciones](./Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md): Ciclo de ofertas (`ACTIVE`, `SOLD`, `CANCELLED`) y libro mayor (*ledger*).
+- 🏪 [Mercado y Transacciones](./Modelos%20y%20Contratos/Mercado%20y%20Transacciones.md): Ciclo de ofertas (`ACTIVE`, `SOLD`, `CANCELLED`) y libro mayor (*ledger*) con `metadata` por tipo.
 
 ### 🔌 [Backend API](./Backend%20API)
-- 🔐 [Autenticación](./Backend%20API/Autenticacion.md): API key del bot (`Authorization: Bot`), JWT de usuario, login OAuth2 con Discord y matriz de permisos.
+- 🔐 [Autenticación](./Backend%20API/Autenticacion.md): API key del bot (`Authorization: Bot`), JWT de usuario, login OAuth2 con Discord (`returnTo`) y matriz de permisos.
 - 🛠️ [Scripts y Mantenimiento](./Backend%20API/Scripts%20y%20Mantenimiento.md): Backfills de estadísticas, Ledger y pity, y migración de imágenes a la nube.
-- 👤 [Endpoints Usuarios y Stats](./Backend%20API/Endpoints%20Usuarios%20y%20Stats.md): `GET /user/:id`, `POST /user`, `POST /dailyBalance`, `GET /transactions`.
-- 🃏 [Endpoints Cartas y Gacha](./Backend%20API/Endpoints%20Cartas.md): `GET /card`, `GET /card/:rarity`, `POST /card` (multipart), `POST /user/:id/card/random`.
+- 👤 [Endpoints Usuarios y Stats](./Backend%20API/Endpoints%20Usuarios%20y%20Stats.md): `GET /user/:id`, `POST /user`, `POST /dailyBalance`, `GET /stats` (racha efectiva, `avatarUrl`), `GET /transactions`, `PATCH /profile` (solo bot).
+- 🃏 [Endpoints Cartas y Gacha](./Backend%20API/Endpoints%20Cartas.md): `GET /card`, `GET /card/:rarity`, `POST /card` (multipart), `DELETE /card/:id` (limpieza transaccional), `POST /user/:id/card/random`.
 - 🏪 [Endpoints Mercado](./Backend%20API/Endpoints%20Mercado.md): `GET /offers`, `POST /offers` (publicar), `POST /buy`, `DELETE /offers/:offerId` (cancelar).
 - 🏆 [Endpoints Leaderboard](./Backend%20API/Endpoints%20Leaderboard.md): Rankings de suerte, rachas (`streaks`), riqueza (`wealth`) y coleccionistas (`cards`).
 - 🖼️ [Hosting de Imágenes](./Backend%20API/Hosting%20de%20Imagenes.md): Abstracción Local, Cloudinary y Supabase Storage.
@@ -38,7 +38,7 @@ Diseños conceptuales y futuras mecánicas en fase de exploración:
 - 📚 [Colecciones y Tags](./Propuestas%20y%20Roadmap/Colecciones%20y%20Tags.md): Cartas etiquetadas en varias colecciones temáticas, progreso por colección y recompensas al completarlas.
 
 ### 🤖 [Bot Discord](./Bot%20Discord)
-- 🏛️ [Arquitectura y Eventos](./Bot%20Discord/Arquitectura%20y%20Eventos.md): Stack, variables de entorno, cliente HTTP con `BOT_API_KEY`, middlewares (`checkUser`, `checkAdmin`) e interacciones.
+- 🏛️ [Arquitectura y Eventos](./Bot%20Discord/Arquitectura%20y%20Eventos.md): Stack, variables de entorno, cliente HTTP con `BOT_API_KEY`, middlewares (`checkUser`, `checkAdmin`), sincronización de perfil e interacciones.
 - 🎨 [Componentes de UI](./Bot%20Discord/Componentes%20de%20UI.md): Embeds interactivos, botones de navegación y paginación protegida.
 - 🪙 [Comandos de Economía](./Bot%20Discord/Comandos%20de%20Economia.md): Referencia y alias (`.balance`, `.getcard`, `.market`, etc.).
 - 🎵 [Comandos de Música](./Bot%20Discord/Comandos%20de%20Musica.md): `.play`, `.stop` con `discord-player`.

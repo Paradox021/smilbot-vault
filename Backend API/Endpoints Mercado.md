@@ -84,3 +84,4 @@ Rutas en `routers/marketRouter.js`, `controllers/marketController.js` y `service
   - `400`: `Offer is not active`, errores de validación del body.
   - `403 You can't remove an offer that is not yours!`
   - `404 Offer not found`
+- Una oferta también puede pasar a `CANCELLED` sin esta ruta si un admin borra la carta del catálogo (`DELETE /card/:id`). En ese caso la copia en escrow **no** se devuelve. Ver [Endpoints Cartas](./Endpoints%20Cartas.md#6-eliminar-carta).

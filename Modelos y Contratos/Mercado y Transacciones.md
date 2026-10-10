@@ -53,7 +53,8 @@ export type TransactionType =
   | 'MARKET_BUY'       // Compra en el mercado (-price)
   | 'MARKET_SELL'      // Ganancia por venta en el mercado (+price)
   | 'TRADE'            // Reservado: ningún endpoint lo genera todavía
-  | 'ADMIN_ADJUST';    // Ajuste manual (POST/DELETE /user/:id/balance/:amount)
+  | 'ADMIN_ADJUST'     // Ajuste manual (POST/DELETE /user/:id/balance/:amount)
+  | 'CARD_REMOVED';    // Un admin borró del catálogo una carta que el usuario tenía o vendía (amount 0)
 
 export interface TransactionSchema {
   _id: ObjectId | string;
@@ -76,9 +77,16 @@ export interface TransactionSchema {
 | `CARD_BUY` | `{ cardId, cardType, cardName, roll, isPity, pityCountBefore, pityCountAfter }` (`roll: null` si fue por pity) |
 | `MARKET_BUY` | `{ cardId, sellerDiscordId, offerId }` |
 | `MARKET_SELL` | `{ cardId, buyerDiscordId, offerId }` |
-| `ADMIN_ADJUST` | `{}` |
+| `ADMIN_ADJUST` | `{}` desde `POST/DELETE /user/:id/balance/:amount`. El snapshot de migración (`scripts/backfillStatsAndLedger.js`) escribe `{ note, migratedAt, legacySnapshot }`. |
+| `CARD_REMOVED` | `{ cardId, cardName, cardType, copiesRemoved, offersCancelled }`. `amount: 0` y `balanceBefore = balanceAfter`. |
+| `TRADE` | Reservado: ningún código lo escribe. |
 
-> El comentario de `models/transaction.js` describe para el mercado `{ offerId, cardId, cardName, cardType, serverId, counterpartyDiscordId }`, pero el controlador no lo escribe así. La tabla de arriba es la fuente correcta.
+En `MARKET_BUY` y `MARKET_SELL`, `cardId` y `offerId` se guardan como string. El comentario de `models/transaction.js` coincide con esta tabla.
+
+### `CARD_REMOVED` (borrado de una carta del catálogo)
+`DELETE /card/:id` ([Endpoints Cartas](../Backend%20API/Endpoints%20Cartas.md#6-eliminar-carta)) escribe **uno por usuario afectado**, dentro de la misma transacción que el borrado:
+- `copiesRemoved`: copias quitadas de su inventario (puede ser `0` si solo tenía la carta en venta).
+- `offersCancelled`: ofertas activas suyas que se cancelaron. La copia en escrow de esas ofertas se pierde.
 
 ### Índices (MongoDB)
 ```javascript
@@ -92,8 +100,9 @@ transactionSchema.index({ type: 1 });
 1. **Al publicar (`POST /market/:serverId/offers`):** la carta se descuenta del inventario del vendedor (`count -= 1`) como depósito en garantía (*escrow*), para que no pueda venderla dos veces.
 2. **Al cancelar (`DELETE /market/:serverId/offers/:offerId`):** la carta vuelve al inventario del vendedor (`count += 1`).
 3. **Al comprar (`POST .../buy`):** se marca la oferta como vendida, se transfiere la carta, se mueve el dinero y se emiten `MARKET_BUY` y `MARKET_SELL`.
+4. **Si un admin borra la carta (`DELETE /card/:id`):** sus ofertas activas pasan a `CANCELLED` (con `active: false` y `cancelledAt`), pero la copia en escrow **no** vuelve al vendedor, porque la carta ya no existe. Se registra un `CARD_REMOVED`.
 
-Las tres operaciones se ejecutan dentro de una **transacción de MongoDB** (`mongoose.connection.transaction` en `services/marketService.js`):
+Publicar, cancelar y comprar se ejecutan dentro de una **transacción de MongoDB** (`mongoose.connection.transaction` en `services/marketService.js`; el borrado de carta usa su propia transacción en `services/cardService.js`):
 - Si cualquier paso falla, no se aplica ninguno (oferta, inventarios, saldos y Ledger).
 - Ante un conflicto de escritura (p. ej. dos compras simultáneas de la misma oferta) la transacción se reintenta; el segundo intento ve la oferta ya vendida y responde `400 Offer is not active`.
 - Requiere que MongoDB sea un **replica set** (Atlas lo es). Un MongoDB *standalone* rechaza las transacciones.

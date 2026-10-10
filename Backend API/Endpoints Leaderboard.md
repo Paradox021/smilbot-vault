@@ -4,6 +4,8 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 
 > 🔐 Todas las rutas requieren autenticación. Permisos por ruta en [Autenticación](./Autenticacion.md#4-matriz-de-permisos).
 
+Cada entrada de los rankings incluye `avatarUrl` (URL del CDN de Discord, o el avatar por defecto si el usuario no tiene hash guardado). Ver [Avatar de Discord](./Endpoints%20Usuarios%20y%20Stats.md).
+
 ---
 
 ## 1. Top Suerte en Gacha
@@ -23,6 +25,7 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
       "rank": 1,
       "discordId": "111222333444555666",
       "username": "LuckyPlayer",
+      "avatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
       "totalCards": 45,
       "luckPercentage": 138.5,
       "luckDelta": "+38.5%",
@@ -47,13 +50,13 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 ## 2. Top Rachas Diarias
 - **Ruta:** `GET /leaderboard/streaks?type=current&limit=10`
 - **Query Params:** `type` (`'current'` o `'max'`, default `'current'`), `limit` (default: `10`, máx. `100`).
-- Solo aparecen usuarios con racha `> 0`.
-- ⚠️ `current` ordena por el `dailyStreak` guardado, que solo se recalcula al reclamar el daily: puede incluir rachas que ya están rotas (más de 48 h sin reclamar). Ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md).
+- **`current`:** solo usuarios con `dailyStreak > 0` **y** `lastDaily` dentro de las últimas 48 h (racha viva). Las rachas ya rotas no aparecen, aunque el valor guardado no se haya recalculado. Ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva).
+- **`max`:** usuarios con `maxDailyStreak > 0`, sin filtro de fecha.
 - **Respuesta:**
 ```json
 [
-  { "discordId": "111...", "username": "Player1", "streak": 45 },
-  { "discordId": "222...", "username": "Player2", "streak": 32 }
+  { "discordId": "111...", "username": "Player1", "avatarUrl": "https://cdn.discordapp.com/avatars/111.../<hash>.png?size=128", "streak": 45 },
+  { "discordId": "222...", "username": "Player2", "avatarUrl": "https://cdn.discordapp.com/embed/avatars/1.png", "streak": 32 }
 ]
 ```
 
@@ -65,8 +68,8 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 - **Respuesta:**
 ```json
 [
-  { "discordId": "111...", "username": "Player1", "amount": 25400 },
-  { "discordId": "333...", "username": "Player3", "amount": 18200 }
+  { "discordId": "111...", "username": "Player1", "avatarUrl": "https://...", "amount": 25400 },
+  { "discordId": "333...", "username": "Player3", "avatarUrl": "https://...", "amount": 18200 }
 ]
 ```
 
@@ -78,7 +81,7 @@ El backend provee endpoints agregados de alto rendimiento en `routers/leaderboar
 - **Respuesta:**
 ```json
 [
-  { "discordId": "111...", "username": "Player1", "cardsCount": 120 },
-  { "discordId": "444...", "username": "Player4", "cardsCount": 98 }
+  { "discordId": "111...", "username": "Player1", "cardsCount": 120, "avatarUrl": "https://..." },
+  { "discordId": "444...", "username": "Player4", "cardsCount": 98, "avatarUrl": "https://..." }
 ]
 ```

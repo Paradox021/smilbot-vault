@@ -45,28 +45,37 @@ export const api = axios.create({
 
 | Método | Ruta | Auth | Descripción |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/auth/discord` | — | Genera `state` (cookie `smilbot_oauth_state`, 10 min) y redirige a Discord (`scope=identify`). |
-| `GET` | `/auth/discord/callback` | — | Valida `state`, intercambia el `code`, crea el usuario si no existe, emite cookies y redirige a `FRONTEND_URL?login=success` (o `?login=error`). |
+| `GET` | `/auth/discord` | — | Genera `state` (cookie `smilbot_oauth_state`, 10 min) y redirige a Discord (`scope=identify`). Acepta `?returnTo=/ruta` opcional (ver abajo). |
+| `GET` | `/auth/discord/callback` | — | Valida `state`, intercambia el `code`, crea el usuario si no existe (o actualiza su `username` y `avatar` desde `/users/@me`), emite cookies y redirige a `FRONTEND_URL` + `returnTo` con `?login=success` (o a `FRONTEND_URL?login=error`). |
 | `POST` | `/auth/refresh` | Refresh token | Rota el par de tokens. Con cookie → renueva cookies y responde `200 { message }`. Con body `{ refreshToken }` → `200 { accessToken, refreshToken }`. `401` si expirado/revocado. |
 | `POST` | `/auth/logout` | Usuario | Revoca todas las sesiones y borra cookies. `204`. |
 | `GET` | `/auth/me` | Usuario | Perfil del usuario autenticado + `isAdmin` (ver abajo). |
 
+### Volver a la ruta original (`returnTo`)
+`GET /auth/discord?returnTo=/perfil?tab=cartas` permite que el frontend vuelva a la página privada que el usuario intentaba abrir.
+- **Validación** (`sanitizeReturnTo` en `libs/authCookies.js`): no vacío, como máximo 512 caracteres, empieza por `/` pero no por `//` ni `/\`, sin `\` ni caracteres de control, y debe seguir siendo una ruta del mismo origen tras normalizarla. Si no cumple, se **ignora en silencio** (el login sigue y vuelve a la raíz).
+- Se guarda en la cookie httpOnly `smilbot_oauth_return` (path `/auth/discord`, 10 min, `SameSite=lax`), junto al `state`. El callback la borra siempre.
+- **Login correcto:** redirige a `FRONTEND_URL` + `returnTo` añadiendo `login=success` (p. ej. `http://localhost:5173/perfil?tab=cartas&login=success`). Sin `returnTo` válido → `FRONTEND_URL?login=success`.
+- **Error:** siempre `FRONTEND_URL?login=error`, sin `returnTo`.
+
 ### Respuesta de `GET /auth/me`
-Objeto **plano**: el documento `User` completo (el mismo que `GET /user/:id`, sin `tokenVersion`) con `isAdmin` añadido en la raíz. `404` si el usuario ya no existe.
+Objeto **plano**: el documento `User` completo (el mismo que `GET /user/:id`, sin `tokenVersion`) con `avatarUrl` e `isAdmin` añadidos en la raíz. `404` si el usuario ya no existe. `dailyStreak` es el valor guardado, no la racha efectiva (ver [Economía y Rachas](../Modelos%20y%20Contratos/Economia%20y%20Rachas.md#2-racha-efectiva)).
 ```json
 {
   "_id": "66bc...",
   "discordId": "123456789012345678",
   "username": "Gamer123",
+  "avatar": "a_1b2c3d4e5f60718293a4b5c6d7e8f901",
   "balance": 650,
   "cards": [{ "cardId": "642d...", "count": 2 }],
   "lastDaily": "2026-10-09T18:00:00.000Z",
   "dailyStreak": 11,
   "...": "resto de campos de User",
+  "avatarUrl": "https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f60718293a4b5c6d7e8f901.gif?size=128",
   "isAdmin": false
 }
 ```
-Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `isAdmin`); los datos que cambian se leen de sus endpoints (`/user/:id/stats`, `/user/:id/cards`).
+Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `avatarUrl`, `isAdmin`); los datos que cambian se leen de sus endpoints (`/user/:id/stats`, `/user/:id/cards`). Cómo se construye `avatarUrl`: [Endpoints Usuarios y Stats](./Endpoints%20Usuarios%20y%20Stats.md).
 
 ### Errores de autenticación
 ```json
@@ -78,6 +87,7 @@ Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `
 // 403
 { "error": "Requiere permisos de administrador" }
 { "error": "No puedes actuar en nombre de otro usuario" }
+{ "error": "Requiere la API key del bot" }
 ```
 
 ---
@@ -86,7 +96,8 @@ Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `
 
 - **Cualquiera autenticado:** lecturas de catálogo, perfiles, inventarios, stats, mercado y leaderboards.
 - **Self:** el usuario solo actúa sobre su propio `discordId`; el bot y los admins sobre cualquiera.
-- **Admin:** bot o `ADMIN_DISCORD_IDS`.
+- **Admin:** bot o `ADMIN_DISCORD_IDS` (`requireAdmin`).
+- **Solo bot:** únicamente la API key del bot (`requireBot`, comprueba `req.auth.type === 'bot'`). Cualquier JWT de usuario recibe `403 Requiere la API key del bot`, aunque sea admin o actúe sobre sí mismo.
 
 | Ruta | Permiso | `discordId` comprobado en |
 | :--- | :--- | :--- |
@@ -94,6 +105,7 @@ Los clientes deberían usarlo solo para la identidad (`discordId`, `username`, `
 | `POST /card`, `DELETE /card/:id` | Admin | — |
 | `GET /user`, `POST /user`, `POST /user/id`, `DELETE /user/:id` | Admin | — |
 | `POST/DELETE /user/:id/card/:cardId`, `POST/DELETE /user/:id/balance/:amount` | Admin | — |
+| `PATCH /user/:id/profile` | Solo bot | — |
 | `GET /user/:id`, `/cards`, `/cards/number`, `/stats` | Autenticado | — |
 | `POST /user/:id/dailyBalance`, `POST /user/:id/card/random`, `GET /user/:id/transactions` | Self | `:id` |
 | `GET /market/:serverId/offers`, `GET /market/:serverId/offers/:offerId` | Autenticado | — |
