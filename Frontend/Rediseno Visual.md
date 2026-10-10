@@ -2,7 +2,7 @@
 
 Definición de la nueva identidad visual de la web, antes de implementarla. Sustituye a la dirección basada en Raycast del `DESIGN.md` actual del frontend.
 
-> Decidido el 2026-10-11. **Estado: implementado** (rama `feature/identidad-visual`, 2026-10-11). El `DESIGN.md` del frontend se ha reescrito a partir de esta nota y es la referencia para implementar; el detalle técnico está en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual). Esta nota conserva el porqué de las decisiones.
+> Decidido el 2026-10-11. **Estado: implementado** (integrado en `master` del frontend el 2026-10-11). El `DESIGN.md` del frontend se ha reescrito a partir de esta nota y es la referencia para implementar; el detalle técnico está en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual). Esta nota conserva el porqué de las decisiones.
 
 ---
 
