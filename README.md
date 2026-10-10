@@ -8,6 +8,7 @@ Esta bóveda de **Obsidian** es la **Única Fuente de Verdad (Single Source of T
 
 - 🤖 **Bot de Discord:** [Paradox021/Smilbot](https://github.com/Paradox021/Smilbot) *(TypeScript / Discord.js v14)*
 - 🔌 **Backend API:** [Paradox021/backendSmilbot](https://github.com/Paradox021/backendSmilbot) *(Node.js / Express / MongoDB)*
+- 🌐 **Frontend Web:** `smilbot-project/smilbot-frontend` *(React / TypeScript / Vite, en inicio)*
 
 ---
 
@@ -41,6 +42,9 @@ Diseños conceptuales y futuras mecánicas en fase de exploración:
 - 🪙 [Comandos de Economía](./Bot%20Discord/Comandos%20de%20Economia.md): Referencia y alias (`.balance`, `.getcard`, `.market`, etc.).
 - 🎵 [Comandos de Música](./Bot%20Discord/Comandos%20de%20Musica.md): `.play`, `.stop` con `discord-player`.
 - 🛠️ [Comandos de Utilidad](./Bot%20Discord/Comandos%20de%20Utilidad.md): `.help`, `.ping`.
+
+### 🌐 [Frontend](./Frontend)
+- 🏗️ [Arquitectura Frontend](./Frontend/Arquitectura%20Frontend.md): Stack, integración con la API (cookies, refresh, login), configuración que debe coincidir con el backend y alcance de la v1.
 
 ---
 
