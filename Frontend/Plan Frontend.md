@@ -2,7 +2,7 @@
 
 Hoja de ruta de las pantallas de la web y decisiones de producto y UX tomadas antes de implementarlas. Cuando una fase se termina, su detalle técnico pasa a [Arquitectura Frontend](./Arquitectura%20Frontend.md) y se marca aquí como hecha.
 
-> Decidido el 2026-10-11. La referencia visual sigue siendo el `DESIGN.md` del repo del frontend (oscuro, monocromo, Inter con `ss03`, CTA blanco). El único color fuerte de la interfaz es el de las **rarezas**: así una carta rara destaca sola.
+> Decidido el 2026-10-11. La identidad visual se redefine en [Rediseño Visual](./Rediseno%20Visual.md) (oscura y cálida, naranja Smilbot, mascota). Hasta implementarla, el `DESIGN.md` del frontend sigue siendo el de referencia. En ambos, los colores fuertes de las cartas son los de las **rarezas**: así una carta rara destaca sola.
 
 ---
 
@@ -40,7 +40,7 @@ Hoja de ruta de las pantallas de la web y decisiones de producto y UX tomadas an
 | Fase | Pantalla | Endpoints | Estado |
 | :--- | :--- | :--- | :--- |
 | 1 | Estructura (nav, saldo) + **Inicio** | `GET /stats`, `POST /dailyBalance` | ✅ Hecha (rama `feature/inicio-y-navegacion`) |
-| 2 | **Tirada** | `POST /card/random` | Pendiente |
+| 2 | **Tirada** | `POST /card/random` | ✅ Hecha (rama `feature/tirada`) |
 | 3 | **Colección** | `GET /card`, `GET /user/:id/cards` | Pendiente |
 | 4 | **Rankings** | `GET /leaderboard/*` | Pendiente |
 | 5 | **Historial** | `GET /user/:id/transactions` | Pendiente |
@@ -86,6 +86,9 @@ Pantalla propia (`/tirar`), a pantalla completa, sin distracciones. Es la pieza 
 5. **Resultado:** nombre, rareza, insignia **"Nueva"** si es la primera copia, "Garantizada por piedad" si `isPity`, pity actualizado y botón "Abrir otro".
 
 ### Escalado por rareza
+
+La duración incluye la anticipación y el giro, sin contar lo que tarde la respuesta. Los valores exactos están en `features/pull/reveal.ts`.
+
 
 | Rareza | Duración aprox. | Anticipación | Revelado |
 | :--- | :--- | :--- | :--- |
@@ -148,10 +151,12 @@ Un **álbum**: el catálogo completo (`GET /card`) cruzado con el inventario (`G
 
 Un único componente `CardTile` para tirada, colección, detalle, rankings y mercado:
 - Marco de 1 px con el color de la rareza (de `shared/config/rarities.ts`), radio de 10 px, fondo `surface`.
+- **La imagen nunca se recorta:** las ilustraciones tienen proporciones distintas (algunas horizontales), así que la cara de la carta toma la proporción de su imagen, con límites de ancho y alto, y el marco y el nombre la rodean. Solo el dorso es 5:7. En la rejilla de la colección (fase 3) habrá que decidir cómo encajar caras de distinto tamaño sin recortarlas.
 - Variantes: `owned`, `locked` (dorso) y `reveal` (para la tirada).
 - La rareza nunca se comunica **solo** con color: también con el nombre de la rareza (accesibilidad).
 
 Véase también:
 - [[Frontend/Arquitectura Frontend|Arquitectura Frontend]]
 - [[Frontend/Pendientes Frontend|Pendientes Frontend]]
+- [[Frontend/Rediseno Visual|Rediseño Visual]]
 - [[Modelos y Contratos/Gacha y Pity|Gacha y Pity]]

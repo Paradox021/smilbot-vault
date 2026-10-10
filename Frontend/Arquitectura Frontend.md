@@ -44,15 +44,28 @@ Vite · React · TypeScript · React Router (SPA) · TanStack Query · Tailwind 
 | :--- | :--- | :--- |
 | `/` | Pública | Portada con "Entrar con Discord". Recibe `?login=success\|error` (es el destino de `FRONTEND_URL`). Con sesión redirige a la ruta de retorno o a `/inicio`. |
 | `/inicio` | Privada | Tablero: reclamo del daily (`POST /user/:id/dailyBalance`) con cuenta atrás y aviso de racha en peligro, racha y progreso de pity. Ver [Plan Frontend](./Plan%20Frontend.md#4-inicio-fase-1). |
+| `/tirar` | Privada | Abrir un sobre (`POST /user/:id/card/random`) con la animación escalada por rareza. Ver [Plan Frontend](./Plan%20Frontend.md#5-tirada-fase-2) y "Tirada" más abajo. |
 | `/perfil` | Privada | Identidad de `GET /auth/me` y stats completas de `GET /user/:id/stats`. Se abre desde el menú de usuario. |
 
 Las rutas privadas sin sesión redirigen a `/` guardando la ruta de retorno.
 
 ### Cabecera y Datos Compartidos
 - **Cabecera (con sesión):** navegación principal (solo los destinos ya implementados, ver `NAV_ITEMS`), **saldo** siempre visible y menú de usuario desplegable (Perfil, Cerrar sesión).
+- **Móvil:** la navegación principal se oculta en la cabecera y pasa a una barra inferior fija (`BottomNav`) con los mismos `NAV_ITEMS`.
 - **Stats del usuario:** `GET /user/:id/stats` vive en la feature `stats` (query key `['stats', 'user', discordId]`) y la comparten la cabecera, Inicio y Perfil: una sola petición en caché.
 - **Daily:** la mutación espera al refetch de las stats antes de terminar, así el saldo, la racha y la cuenta atrás ya están al día cuando se muestra el resultado.
+- **Inventario:** `GET /user/:id/cards` vive en la feature `inventory` (query key `['inventory', 'user', discordId]`).
 - **Rendimiento:** la cabecera está en el bundle principal, así que no usa Motion (el contador del saldo usa `requestAnimationFrame`). Motion solo se carga en las páginas diferidas.
+
+### Tirada
+- **Secuencia** (`features/pull/sequence.ts`, un reducer puro): `idle` → `shuffling` (petición en vuelo) → `anticipation` (brillo del color de la rareza) → `revealing` (giro) → `result`. Los tiempos y efectos por rareza están en `features/pull/reveal.ts`.
+- **Saltar:** el botón "Saltar", tocar el escenario o cualquier tecla llevan al resultado. Si se salta antes de que llegue la respuesta, la carta se muestra en cuanto llega.
+- **Movimiento reducido:** sin giro ni efectos; la carta aparece con un fundido.
+- **"Nueva":** se calcula con el inventario en caché antes de tirar (la página lo precarga). Si el inventario no ha cargado, no se muestra la insignia.
+- **Tras tirar:** se añade la carta al inventario en caché y se invalidan el inventario y las stats (saldo y pity). Los errores `400` (sin saldo) y `404` (rareza sin cartas, no se cobra) vuelven al estado inicial con su mensaje.
+- **Accesibilidad:** la cara de la carta no está en el DOM hasta el giro; el resultado se anuncia en una región `aria-live`.
+- **Cartas:** las caras (`CardFront` con imagen de reserva, `CardBack`) son de la feature `cards` y las reutilizará la colección. `CardFront` muestra la imagen entera a su proporción original (máx. 18 rem de alto y 20 rem de ancho), así que el dorso (5:7) y la cara se centran en una caja fija para que la carta no cambie de sitio al girar.
+- **Precarga de la imagen:** la mutación espera a que la imagen de la carta cargue (máx. 3 s) antes de terminar, mientras la carta se baraja; así la cara aparece ya con su tamaño final.
 
 ### Volver a la ruta original tras el login
 1. `RequireAuth` manda al usuario sin sesión a `/` con `state.returnTo` (ruta + query actuales, sin el parámetro `login`).

@@ -27,7 +27,7 @@ Endpoints o cambios que el frontend necesita y aún no existen o no están docum
 ## 3. Pendientes Propios del Frontend
 
 - **Dependencias del stack aún sin usar:** `react-hook-form` y `@hookform/resolvers`. Se usarán en el mercado y en los formularios.
-- **Bundle principal por encima de 500 kB** (552 kB, 177 kB gzip) desde que la cabecera usa el menú desplegable de Radix. No bloquea, pero conviene revisarlo al añadir más pantallas (separar vendors o diferir el menú).
+- **Peso de la carga inicial:** unos 180 kB gzip (código de la app, React y el menú desplegable de Radix). Desde la fase 2 el bundler lo separa en dos chunks y ya no salta el aviso de 500 kB; Motion va en un chunk diferido que comparten Inicio y Tirar. Vigilarlo al añadir pantallas.
 - **Página 404 sin carga diferida.** La regla de `lazy` se aplica a las páginas de las features; la 404 vive en `app/` y es mínima.
 
 > ✅ Resueltos el 2026-10-10: volver a la ruta original tras el login (`returnTo`) y CSS de shadcn copiado a mano (ahora se importa del paquete). Ver [Arquitectura Frontend](./Arquitectura%20Frontend.md).
