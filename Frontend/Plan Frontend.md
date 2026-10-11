@@ -78,18 +78,19 @@ Invalida: `stats` del usuario.
 
 Pantalla propia (`/tirar`), a pantalla completa, sin distracciones. Es la pieza con más diseño de la web.
 
-> La [fase 2 del rediseño](./Rediseno%20Visual%20-%20Fase%202.md#5-la-tirada-con-sobre) cambiará el dorso suelto por un sobre que se rasga, manteniendo los tiempos por rareza. Esta sección describe la versión implementada.
+> Desde la [fase 2 del rediseño](./Rediseno%20Visual%20-%20Fase%202.md#5-la-tirada-con-sobre) se abre un sobre que se rasga, con los mismos tiempos por rareza más la apertura (400 ms).
 
 ### Flujo
-1. **Antes de tirar:** sobre/dorso de carta en el centro, botón "Abrir sobre · 100", saldo y pity visibles. Si el saldo no llega, el botón se desactiva con "Te faltan X monedas" (se sabe por `stats`, sin esperar al `400`).
-2. **Petición en vuelo:** el dorso empieza a "barajarse" en cuanto se pulsa. Disimula la latencia: la animación arranca antes de que llegue la respuesta.
-3. **Anticipación según la rareza** (cuando ya se conoce el resultado): el dorso se ilumina con el color de la rareza antes de girar.
-4. **Revelado:** la carta gira y se muestra con su marco de rareza.
-5. **Resultado:** nombre, rareza, insignia **"Nueva"** si es la primera copia, "Garantizada por piedad" si `isPity`, pity actualizado y botón "Abrir otro".
+1. **Antes de tirar:** el sobre de Smilbot en el centro (respira suavemente), botón "Abrir sobre · 100", saldo y pity visibles. Si el saldo no llega, el botón se desactiva con "Te faltan X monedas" (se sabe por `stats`, sin esperar al `400`).
+2. **Petición en vuelo:** el sobre tiembla en cuanto se pulsa (o se desliza el dedo por su línea de corte). Disimula la latencia: la animación arranca antes de que llegue la respuesta.
+3. **Anticipación según la rareza** (cuando ya se conoce el resultado): por la línea de corte se escapa luz del color de la rareza.
+4. **Apertura:** la solapa se rasga y sale volando; la carta asoma con su marco.
+5. **Revelado:** la carta sube desde dentro del sobre y gira; el sobre cae y se desvanece.
+6. **Resultado:** nombre, rareza, insignia **"Nueva"** si es la primera copia (o "Ya la tenías · ×N"), reacción de Smilbot en Épica o mejor, "Garantizada por piedad" si `isPity`, pity actualizado y botón "Abrir otro".
 
 ### Escalado por rareza
 
-La duración incluye la anticipación y el giro, sin contar lo que tarde la respuesta. Los valores exactos están en `features/pull/reveal.ts`.
+La duración incluye la anticipación y el giro, sin contar lo que tarde la respuesta ni la apertura del sobre (400 ms en todas). Los valores exactos están en `features/pull/reveal.ts`.
 
 
 | Rareza | Duración aprox. | Anticipación | Revelado |
@@ -101,7 +102,7 @@ La duración incluye la anticipación y el giro, sin contar lo que tarde la resp
 | Mítica | ~3 s | El fondo de la pantalla se tiñe; tres pulsos | Destello grande, partículas y brillo holográfico en la carta |
 
 - **Siempre se puede saltar:** tocar o pulsar cualquier tecla lleva al resultado al instante.
-- **`prefers-reduced-motion`:** sin giros ni partículas; la carta aparece con un fundido y el marco de rareza.
+- **`prefers-reduced-motion`:** sin temblor, rasgado, giros ni partículas; el sobre se funde y aparece la carta con su marco.
 - La anticipación nunca miente: el color que aparece antes del giro es siempre el de la carta que sale.
 - Animaciones con Motion, solo `transform` y `opacity`.
 - **Errores:** `400` sin saldo y `404 No cards found for this type` (no se cobra) vuelven al estado inicial con el mensaje; la animación se corta.

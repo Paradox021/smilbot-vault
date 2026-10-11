@@ -4,7 +4,7 @@ SPA web de Smilbot para que los usuarios inicien sesión con Discord y consulten
 Las reglas de código y estructura detalladas están en el `AGENTS.md` del repo del frontend; esta nota recoge lo que el **resto del ecosistema** necesita saber.
 
 - **Repo local:** `smilbot-project/smilbot-frontend`
-- **Estado:** sesión, perfil, fases 1 y 2 del [Plan Frontend](./Plan%20Frontend.md) (Inicio con daily y tirada) e identidad visual de [Rediseño Visual](./Rediseno%20Visual.md). Sin desplegar.
+- **Estado:** sesión, perfil, fases 1 y 2 del [Plan Frontend](./Plan%20Frontend.md) (Inicio con daily y tirada) e identidad visual de [Rediseño Visual](./Rediseno%20Visual.md) (fases 1 y 2, sin los sonidos opcionales). Sin desplegar.
 
 ---
 
@@ -55,25 +55,31 @@ Las rutas privadas sin sesión redirigen a `/` guardando la ruta de retorno.
 - **Stats del usuario:** `GET /user/:id/stats` vive en la feature `stats` (query key `['stats', 'user', discordId]`) y la comparten la cabecera, Inicio y Perfil: una sola petición en caché.
 - **Daily:** la mutación espera al refetch de las stats antes de terminar, así el saldo, la racha y la cuenta atrás ya están al día cuando se muestra el resultado.
 - **Inventario:** `GET /user/:id/cards` vive en la feature `inventory` (query key `['inventory', 'user', discordId]`).
-- **Rendimiento:** la cabecera está en el bundle principal, así que no usa Motion (el contador del saldo usa `requestAnimationFrame`). Motion solo se carga en las páginas diferidas.
+- **Rendimiento:** la cabecera está en el bundle principal, así que no usa Motion (el contador del saldo usa `requestAnimationFrame` y las monedas que vuelan, Web Animations). Motion solo se carga en las páginas diferidas.
+- **Efectos del saldo** (`shared/lib/balanceFx.ts`): las features que cambian el saldo emiten un efecto (`gain` con el rectángulo de origen al reclamar el daily, `spend` al tirar) y `BalancePill` lo pinta: monedas que vuelan hasta la píldora o "−100" que flota. Así `daily` y `pull` no importan `stats` para animar.
 
 ### Identidad Visual
 La decisión está en [Rediseño Visual](./Rediseno%20Visual.md) y la referencia de implementación en el `DESIGN.md` del frontend.
 - **Tokens:** en `src/index.css` (variables de shadcn/ui). `--radius` es 16 px (`rounded-lg`, tarjetas); las cartas y los campos usan `rounded-md` (12 px); botones, insignias y pestañas, `rounded-full`. `--ring` ya incluye la opacidad.
 - **Fuentes:** Nunito (`@fontsource-variable/nunito`) en `font-heading`, aplicada por defecto a `h1`-`h3`; Inter en el resto.
 - **Mascota:** componente `Mascot` (`shared/ui/mascot.tsx`), con `srcset` sobre `src/assets/mascot/smilbot-{128,320,640}.webp`. Favicon en `public/favicon-32.png` y `public/apple-touch-icon.png`. Los ficheros fuente están en la bóveda (`Frontend/assets/`).
-- **Una acción principal por pantalla:** en Inicio, el botón naranja es el del daily si está disponible; si no, el acceso a la tirada (`GuaranteeCard` recibe `primaryAction` según `getDailyStatus`).
+- **Una acción principal por pantalla:** en Inicio, la tarjeta de hoy (`TodayCard`) muestra el daily si está disponible y, si no, "Abrir un sobre"; es la única con botón naranja. Con el daily disponible, la mítica garantizada ofrece un acceso secundario a la tirada.
+- **Movimiento:** tokens en `shared/config/motion.ts` (Motion) y sus equivalentes CSS en `src/index.css` (`--ease-*`, `--animate-*`). Botones con pulsado (`scale` 0,97).
+- **Smilbot como guía:** `SmilbotSays` (`shared/ui/smilbot-says.tsx`), mascota con bocadillo. En Inicio el mensaje sale de `features/home/smilbotMessage.ts` (racha en peligro > daily > mítica cerca > primer sobre > saludo del día); en la tirada, de `features/pull/smilbotReaction.ts` (Épica o mejor y repetidas).
+- **Errores y carga de sesión:** `ErrorState` (`shared/ui/error-state.tsx`) con la mascota y "Reintentar"; la comprobación de sesión muestra a Smilbot "despertándose".
 - **Login:** mascota grande con halo y motas fijas, texto de bienvenida y "Continuar con Discord" con el logo de Discord (`DiscordIcon`, de Simple Icons).
 
 ### Tirada
-- **Secuencia** (`features/pull/sequence.ts`, un reducer puro): `idle` → `shuffling` (petición en vuelo) → `anticipation` (brillo del color de la rareza) → `revealing` (giro) → `result`. Los tiempos y efectos por rareza están en `features/pull/reveal.ts`.
+- **Secuencia** (`features/pull/sequence.ts`, un reducer puro): `idle` (sobre en reposo) → `shuffling` (petición en vuelo, el sobre tiembla) → `anticipation` (luz de la rareza por la línea de corte) → `opening` (la solapa se rasga, 400 ms) → `revealing` (la carta sube y gira) → `result`. Los tiempos y efectos por rareza están en `features/pull/reveal.ts`.
+- **Sobre:** `PackArt` (`features/cards`, SVG con los tokens) y su geometría en `features/cards/pack.ts`; en la tirada se pinta dos veces recortado por la línea de corte (solapa y cuerpo). Se puede rasgar deslizando el dedo por la línea de corte (`useSwipeToTear`); el botón sigue siendo el camino principal.
+- **Vibración:** una vez por tirada al revelar Épica o mejor, donde exista `navigator.vibrate`.
 - **Saltar:** el botón "Saltar", tocar el escenario o cualquier tecla llevan al resultado. Si se salta antes de que llegue la respuesta, la carta se muestra en cuanto llega.
-- **Movimiento reducido:** sin giro ni efectos; la carta aparece con un fundido.
-- **"Nueva":** se calcula con el inventario en caché antes de tirar (la página lo precarga). Si el inventario no ha cargado, no se muestra la insignia.
+- **Movimiento reducido:** sin temblor, rasgado, giro ni efectos; el sobre se funde y aparece la carta.
+- **"Nueva" y repetidas:** se calculan con el inventario en caché antes de tirar (la página lo precarga): `copies` es el número de copias tras la tirada ("Ya la tenías · ×N"). Si el inventario no ha cargado, no se muestra ninguna de las dos.
 - **Tras tirar:** se añade la carta al inventario en caché y se invalidan el inventario y las stats (saldo y pity). Los errores `400` (sin saldo) y `404` (rareza sin cartas, no se cobra) vuelven al estado inicial con su mensaje.
-- **Accesibilidad:** la cara de la carta no está en el DOM hasta el giro; el resultado se anuncia en una región `aria-live`.
-- **Cartas:** las caras (`CardFront` con imagen de reserva, `CardBack`) son de la feature `cards` y las reutilizará la colección. `CardFront` muestra la imagen entera a su proporción original (máx. 18 rem de alto y 20 rem de ancho), así que el dorso (5:7) y la cara se centran en una caja fija para que la carta no cambie de sitio al girar.
-- **Precarga de la imagen:** la mutación espera a que la imagen de la carta cargue (máx. 3 s) antes de terminar, mientras la carta se baraja; así la cara aparece ya con su tamaño final.
+- **Accesibilidad:** la cara de la carta no está en el DOM hasta el giro; el resultado (con la reacción de Smilbot) se anuncia en una región `aria-live` y el bocadillo es solo visual.
+- **Cartas:** las caras (`CardFront` con imagen de reserva, `CardBack`) son de la feature `cards` y las reutilizará la colección. `CardFront` muestra la imagen entera a su proporción original (máx. 18 rem de alto y 20 rem de ancho), así que el sobre, el dorso (5:7) y la cara se centran en una caja fija para que nada cambie de sitio al abrir o girar.
+- **Precarga de la imagen:** la mutación espera a que la imagen de la carta cargue (máx. 3 s) antes de terminar, mientras el sobre tiembla; así la cara aparece ya con su tamaño final.
 
 ### Volver a la ruta original tras el login
 1. `RequireAuth` manda al usuario sin sesión a `/` con `state.returnTo` (ruta + query actuales, sin el parámetro `login`).

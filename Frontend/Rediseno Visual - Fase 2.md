@@ -4,7 +4,7 @@ Segunda fase del rediseño. La [fase 1](./Rediseno%20Visual.md) cambió el **asp
 
 Esta fase cambia **cómo se vive**: la estructura de las pantallas, el movimiento y la voz de Smilbot.
 
-> Decidido el 2026-10-11. **Estado: definido, pendiente de implementar.** Se recomienda hacerla **antes de la fase 3 (Colección)** del [Plan Frontend](./Plan%20Frontend.md), para que la Colección nazca ya con este lenguaje (sistema de movimiento, cartas y mascota).
+> Decidido el 2026-10-11. **Estado: implementado (etapas 1 a 5) el 2026-10-11** en las ramas `feature/fase2-*` del frontend; los sonidos (etapa 6, opcional) siguen pendientes. Detalle técnico en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual) y referencia en el `DESIGN.md` del frontend. Los ajustes respecto a lo definido están en la sección 13. Se recomienda hacerla **antes de la fase 3 (Colección)** del [Plan Frontend](./Plan%20Frontend.md), para que la Colección nazca ya con este lenguaje (sistema de movimiento, cartas y mascota).
 
 ---
 
@@ -186,6 +186,18 @@ Cada etapa es una rama propia y se puede probar por separado:
 
 Al terminar cada etapa se actualizan `DESIGN.md`, [Arquitectura Frontend](./Arquitectura%20Frontend.md) y, si cambia el flujo de la tirada, la sección 5 del [Plan Frontend](./Plan%20Frontend.md).
 
+
+---
+
+## 13. Ajustes al Implementar
+
+- **`SmilbotSays` sin parámetro de pose.** Con una sola foto sería código muerto; se añadirá junto con las poses de la ilustración (sección 9).
+- **Botón del daily:** "Reclamar" (la cantidad ya se ve en grande al lado).
+- **Huellas de la racha:** rellenas en crema (como el progreso) y la de hoy con anillo; si aún no se ha reclamado, discontinua (en ámbar si la racha está en peligro).
+- **Con el daily disponible**, la tarjeta de la mítica garantizada lleva un acceso secundario a la tirada, para no perderlo de vista.
+- **En móvil, el botón de la tirada queda fijo** sobre la barra inferior: con la reacción de Smilbot el resultado ya no cabe entero en pantalla.
+- **Perfil:** la ficha mantiene el ID de Discord (en pequeño) y la tarjeta "Colección" desaparece (sus cifras pasan a la fila de cifras clave). El pity usa el mismo medidor mítico que Inicio.
+- **"−100" y "+100"** flotan junto a la píldora del saldo; las monedas del daily salen cuando el backend ha confirmado el reclamo.
 
 Véase también:
 - [[Frontend/Rediseno Visual|Rediseño Visual (fase 1)]]
