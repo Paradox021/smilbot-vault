@@ -4,7 +4,7 @@ Segunda fase del rediseño. La [fase 1](./Rediseno%20Visual.md) cambió el **asp
 
 Esta fase cambia **cómo se vive**: la estructura de las pantallas, el movimiento y la voz de Smilbot.
 
-> Decidido el 2026-10-11. **Estado: implementado (etapas 1 a 5) el 2026-10-11** en las ramas `feature/fase2-*` del frontend; los sonidos (etapa 6, opcional) siguen pendientes. Detalle técnico en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual) y referencia en el `DESIGN.md` del frontend. Los ajustes respecto a lo definido están en la sección 13. Se recomienda hacerla **antes de la fase 3 (Colección)** del [Plan Frontend](./Plan%20Frontend.md), para que la Colección nazca ya con este lenguaje (sistema de movimiento, cartas y mascota).
+> Decidido el 2026-10-11. **Estado: implementado (etapas 1 a 5) el 2026-10-11** y fusionado en `master` del frontend; los sonidos (etapa 6, opcional) quedan aplazados. Detalle técnico en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual) y referencia en el `DESIGN.md` del frontend. Los ajustes respecto a lo definido están en la sección 13. Se recomienda hacerla **antes de la fase 3 (Colección)** del [Plan Frontend](./Plan%20Frontend.md), para que la Colección nazca ya con este lenguaje (sistema de movimiento, cartas y mascota).
 
 ---
 
