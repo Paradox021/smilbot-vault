@@ -83,8 +83,8 @@ Pantalla propia (`/tirar`), a pantalla completa, sin distracciones. Es la pieza 
 ### Flujo
 1. **Antes de tirar:** el sobre de Smilbot en el centro (respira suavemente), botón "Abrir sobre · 100", saldo y pity visibles. Si el saldo no llega, el botón se desactiva con "Te faltan X monedas" (se sabe por `stats`, sin esperar al `400`).
 2. **Petición en vuelo:** el sobre tiembla en cuanto se pulsa (o se desliza el dedo por su línea de corte). Disimula la latencia: la animación arranca antes de que llegue la respuesta.
-3. **Anticipación según la rareza** (cuando ya se conoce el resultado): por la línea de corte se escapa luz del color de la rareza.
-4. **Apertura:** la solapa se rasga y sale volando; la carta asoma con su marco.
+3. **Anticipación según la rareza** (cuando ya se conoce el resultado): el sobre se ilumina desde dentro con el color de la rareza (halo alrededor y ranura que brilla por la perforación).
+4. **Apertura:** la solapa se rasga y sale volando; un haz de luz sale por la boca y la carta asoma con su marco.
 5. **Revelado:** la carta sube desde dentro del sobre y gira; el sobre cae y se desvanece.
 6. **Resultado:** nombre, rareza, insignia **"Nueva"** si es la primera copia (o "Ya la tenías · ×N"), reacción de Smilbot en Épica o mejor, "Garantizada por piedad" si `isPity`, pity actualizado y botón "Abrir otro".
 
