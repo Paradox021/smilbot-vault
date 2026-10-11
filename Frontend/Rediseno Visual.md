@@ -1,8 +1,10 @@
-# 🐾 Rediseño Visual: Identidad de Smilbot
+# 🐾 Rediseño Visual: Identidad de Smilbot (Fase 1)
 
 Definición de la nueva identidad visual de la web, antes de implementarla. Sustituye a la dirección basada en Raycast del `DESIGN.md` actual del frontend.
 
 > Decidido el 2026-10-11. **Estado: implementado** (integrado en `master` del frontend el 2026-10-11). El `DESIGN.md` del frontend se ha reescrito a partir de esta nota y es la referencia para implementar; el detalle técnico está en [Arquitectura Frontend](./Arquitectura%20Frontend.md#identidad-visual). Esta nota conserva el porqué de las decisiones.
+>
+> Esta fase cambió el **aspecto** (paleta, tipografía, formas, mascota y login). La estructura de las pantallas, el movimiento y la voz de Smilbot son la [fase 2](./Rediseno%20Visual%20-%20Fase%202.md).
 
 ---
 
@@ -132,7 +134,7 @@ Smilbot (el gato naranja) aparece donde la app tiene que **tener voz**, no como 
 | 404 y errores | Mediana ("Smilbot no encuentra esta página") |
 | Logo de la cabecera y favicon | Pequeña, en círculo |
 
-No aparece en las pantallas de datos (Inicio, Colección, Rankings) salvo en sus estados vacíos.
+No aparece en las pantallas de datos (Inicio, Colección, Rankings) salvo en sus estados vacíos. **La fase 2 cambia esta regla:** Smilbot aparece también en Inicio y en la tirada como guía, con un bocadillo ([fase 2, sección 3](./Rediseno%20Visual%20-%20Fase%202.md#3-smilbot-como-guía)).
 
 ### La foto original
 
@@ -248,6 +250,7 @@ Mismas reglas: superficies, tarjetas de 16 px y cifras en Nunito. Los estados va
 
 
 Véase también:
+- [[Frontend/Rediseno Visual - Fase 2|Rediseño Visual (fase 2)]]
 - [[Frontend/Plan Frontend|Plan Frontend]]
 - [[Frontend/Arquitectura Frontend|Arquitectura Frontend]]
 - [[Modelos y Contratos/Cartas y Rarezas|Cartas y Rarezas]]

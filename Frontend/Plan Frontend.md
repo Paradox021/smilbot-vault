@@ -78,6 +78,8 @@ Invalida: `stats` del usuario.
 
 Pantalla propia (`/tirar`), a pantalla completa, sin distracciones. Es la pieza con más diseño de la web.
 
+> La [fase 2 del rediseño](./Rediseno%20Visual%20-%20Fase%202.md#5-la-tirada-con-sobre) cambiará el dorso suelto por un sobre que se rasga, manteniendo los tiempos por rareza. Esta sección describe la versión implementada.
+
 ### Flujo
 1. **Antes de tirar:** sobre/dorso de carta en el centro, botón "Abrir sobre · 100", saldo y pity visibles. Si el saldo no llega, el botón se desactiva con "Te faltan X monedas" (se sabe por `stats`, sin esperar al `400`).
 2. **Petición en vuelo:** el dorso empieza a "barajarse" en cuanto se pulsa. Disimula la latencia: la animación arranca antes de que llegue la respuesta.
@@ -159,4 +161,5 @@ Véase también:
 - [[Frontend/Arquitectura Frontend|Arquitectura Frontend]]
 - [[Frontend/Pendientes Frontend|Pendientes Frontend]]
 - [[Frontend/Rediseno Visual|Rediseño Visual]]
+- [[Frontend/Rediseno Visual - Fase 2|Rediseño Visual (fase 2)]]
 - [[Modelos y Contratos/Gacha y Pity|Gacha y Pity]]
