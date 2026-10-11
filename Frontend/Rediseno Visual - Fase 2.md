@@ -198,7 +198,7 @@ Al terminar cada etapa se actualizan `DESIGN.md`, [Arquitectura Frontend](./Arqu
 - **En móvil, el botón de la tirada queda fijo** sobre la barra inferior: con la reacción de Smilbot el resultado ya no cabe entero en pantalla.
 - **Perfil:** la ficha mantiene el ID de Discord (en pequeño) y la tarjeta "Colección" desaparece (sus cifras pasan a la fila de cifras clave). El pity usa el mismo medidor mítico que Inicio.
 - **"−100" y "+100"** flotan junto a la píldora del saldo; las monedas del daily salen cuando el backend ha confirmado el reclamo.
-- **Luz de la rareza (2026-10-11, tras probarla):** la primera versión era una franja de luz encima de la línea de corte que se salía del sobre y parecía un fallo. Ahora la luz sale del propio sobre (halo alrededor y ranura que brilla por la perforación) y al rasgarlo un haz corto sale por la boca. También se corrigió que la carta se transparentara a través del sobre al caer y que los rayos del resultado se cortaran en móvil.
+- **Luz de la rareza (2026-10-11, tras probarla):** la primera versión era una franja de luz encima de la línea de corte que se salía del sobre y parecía un fallo. Ahora la luz sale del propio sobre (halo alrededor y ranura que brilla por la perforación) y al rasgarlo un haz corto sale por la boca. El sobre cae y se pierde por el borde inferior antes de que la carta gire (antes se superponían), el sobre ya no parpadea en la segunda tirada y siguientes (el bucle del temblor alcanzaba a la opacidad), y se corrigió y que los rayos del resultado se cortaran en móvil.
 
 Véase también:
 - [[Frontend/Rediseno Visual|Rediseño Visual (fase 1)]]
